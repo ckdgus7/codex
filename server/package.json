@@ -1,0 +1,18 @@
+{
+  "name": "codex-api-server",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node index.mjs",
+    "serve": "node serve.mjs",
+    "high": "node high.mjs",
+    "diffs": "node diffs.mjs"
+  },
+  "dependencies": {
+    "crypto": "^1.0.1",
+    "express": "^4.19.2",
+    "pixelmatch": "^7.1.0",
+    "playwright": "^1.58.2",
+    "pngjs": "^7.0.0"
+  }
+}
