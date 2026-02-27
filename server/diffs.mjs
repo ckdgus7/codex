@@ -21,12 +21,6 @@ app.use((req, res, next) => {
   next();
 });
 
-const FIGMA_PAT = 'figd_kuHe8CYDNouxxjzijblstXsYxLNwU-0nGl7PXOoL';
-if (!FIGMA_PAT) {
-  console.error('Missing FIGMA_PAT env var');
-  process.exit(1);
-}
-
 /* -----------------------------
  * Helpers: safe output
  * ----------------------------- */
@@ -66,8 +60,8 @@ function parseFigmaUrl(figmaUrl) {
  * Figma REST helpers
  * ----------------------------- */
 async function figmaFetchJson(url) {
-  const r = await fetch(url, { headers: { 'X-Figma-Token': FIGMA_PAT } });
-  if (!r.ok) throw new Error(`Figma API ${r.status}: ${await r.text()}`);
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(` API ${r.status}: ${await r.text()}`);
   return r.json();
 }
 function nodesUrl({ fileKey, ids, depth = 10, geometryPaths = true }) {
