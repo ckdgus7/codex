@@ -16,9 +16,8 @@ app.use((req, res, next) => {
   next();
 });
 
-// const FIGMA_PAT = 'figd_kuHe8CYDNouxxjzijblstXsYxLNwU-0nGl7PXOoL';
+// const FIGMA_PAT = '';
 // if (!FIGMA_PAT) {
-//   console.error('Missing FIGMA_PAT env var');
 //   process.exit(1);
 // }
 
