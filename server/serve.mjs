@@ -16,6 +16,12 @@ app.use((req, res, next) => {
   next();
 });
 
+const FIGMA_PAT = 'figd_kuHe8CYDNouxxjzijblstXsYxLNwU-0nGl7PXOoL';
+if (!FIGMA_PAT) {
+  console.error('Missing FIGMA_PAT env var');
+  process.exit(1);
+}
+
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 /* -----------------------------
@@ -67,7 +73,7 @@ async function figmaFetchJson(url) {
   console.log(`figmaFetchJson. url=${url}`);
   const r = await fetch(url, {
     method: 'GET',
-    headers: { 'X-Figma-Token': '' },
+    headers: { 'X-Figma-Token': FIGMA_PAT },
   });
   // await sleep(retryAfterSec * 1000);
   // console.log('r', r);
