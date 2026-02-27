@@ -16,11 +16,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// const FIGMA_PAT = '';
-// if (!FIGMA_PAT) {
-//   process.exit(1);
-// }
-
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 /* -----------------------------
@@ -72,7 +67,7 @@ async function figmaFetchJson(url) {
   console.log(`figmaFetchJson. url=${url}`);
   const r = await fetch(url, {
     method: 'GET',
-    headers: { 'X-Figma-Token': FIGMA_PAT },
+    headers: { 'X-Figma-Token': '' },
   });
   // await sleep(retryAfterSec * 1000);
   // console.log('r', r);
