@@ -21,11 +21,13 @@
         &nbsp;
         <button @click="setMakeVueFile2Pass">figma로 파일 만들기 2Pass</button>
         &nbsp;&nbsp;&nbsp; -->
-        <button @click="setMakeVueFileHigh">figma로 파일 만들기 High</button>
+        <button @click="setMakeVueFileHigh">Vue High</button>
         <!-- &nbsp;
         <button @click="setMakeVueFile2PassHigh">figma로 파일 만들기 2Pass High</button> -->
         &nbsp;&nbsp;&nbsp;
-        <button @click="setMakeVueFileDiffs">figma로 파일 만들기 Diffs</button>
+        <button @click="setMakeVueFileDiffs">Vue Diffs</button>
+        &nbsp;&nbsp;&nbsp;
+        <button @click="setMakeReactFileHigh">React High</button>
       </div>
       <div></div>
       <textarea
@@ -69,6 +71,7 @@
     runFigmaVueMakeHigh,
     runFigmaVueMake2PassHigh,
     runFigmaVueMakeDiffs,
+    runFigmaReactMakeHigh,
   } from './api';
 
   const previewUrl = 'http://localhost:5174';
@@ -124,9 +127,6 @@
     }
   }
 
-  function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
   async function setMakeVueFile() {
     const response = await runFigmaVueMake(prompt.value);
     console.log('Figma Vue Make Response:', response.ok);
@@ -145,6 +145,10 @@
   }
   async function setMakeVueFileDiffs() {
     const response = await runFigmaVueMakeDiffs(prompt.value);
+    console.log('Figma Vue Make Response:', response.ok);
+  }
+  async function setMakeReactFileHigh() {
+    const response = await runFigmaReactMakeHigh(prompt.value);
     console.log('Figma Vue Make Response:', response.ok);
   }
 </script>
@@ -203,7 +207,8 @@
     margin: 12px;
     padding: 10px;
     resize: vertical;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+    font-family:
+      ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
   }
 
   .actions {

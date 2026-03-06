@@ -76,3 +76,13 @@ export async function runFigmaVueMakeDiffs(prompt: string): Promise<any> {
   if (!res.ok) throw new Error(`run failed: ${res.status}`);
   return res.json();
 }
+export async function runFigmaReactMakeHigh(prompt: string): Promise<any> {
+  const body = prompt ? JSON.stringify({ prompt }) : undefined;
+  const res = await fetch(`${API_BASE}/api/generate-react`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body,
+  });
+  if (!res.ok) throw new Error(`run failed: ${res.status}`);
+  return res.json();
+}

@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "node index.mjs",
+    "react": "node react_serve.mjs",
     "serve": "node serve.mjs",
     "high": "node high.mjs",
     "diffs": "node diffs.mjs"
