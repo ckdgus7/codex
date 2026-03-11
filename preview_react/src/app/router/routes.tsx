@@ -5,6 +5,9 @@ import { LayoutRoute } from '@/shared/ui/LayoutRoute';
 const NoticeListPage = lazy(() =>
   import('@/pages/notices/NoticeListPage').then(m => ({ default: m.default })),
 );
+const NoticeDetailPage = lazy(() =>
+  import('@/pages/notices/NoticeDetailPage').then(m => ({ default: m.NoticeDetailPage })),
+);
 
 const RequirementsPage = lazy(() =>
   import('@/pages/requirements/RequirementsPage').then(m => ({ default: m.RequirementsPage })),
@@ -58,14 +61,14 @@ const QnaPage = lazy(() =>
 const DomainPage = lazy(() =>
   import('@/pages/ssf/DomainPage').then(m => ({ default: m.DomainPage })),
 );
-const ComponentInfoPage = lazy(() =>
-  import('@/pages/ssf/ComponentInfoPage').then(m => ({ default: m.ComponentInfoPage })),
+const L2ComponentInfoPage = lazy(() =>
+  import('@/pages/ssf/L2ComponentInfoPage').then(m => ({ default: m.L2ComponentInfoPage })),
 );
 const BusinessInfoPage = lazy(() =>
   import('@/pages/ssf/BusinessInfoPage').then(m => ({ default: m.BusinessInfoPage })),
 );
-const FunctionInfoPage = lazy(() =>
-  import('@/pages/ssf/FunctionInfoPage').then(m => ({ default: m.FunctionInfoPage })),
+const FeatureInfoPage = lazy(() =>
+  import('@/pages/ssf/FeatureInfoPage').then(m => ({ default: m.FeatureInfoPage })),
 );
 const SsfExplorerPage = lazy(() =>
   import('@/pages/ssf/SsfExplorerPage').then(m => ({ default: m.SsfExplorerPage })),
@@ -130,12 +133,13 @@ export const routes: RouteObject[] = [
       { path: '/features/detail-design', element: withSuspense(DetailFeatureDesignPage) },
 
       { path: '/notices', element: withSuspense(NoticeListPage) },
+      { path: '/notices/:id', element: withSuspense(NoticeDetailPage) },
       { path: '/qna', element: withSuspense(QnaPage) },
 
       { path: '/ssf/domain', element: withSuspense(DomainPage) },
-      { path: '/ssf/component', element: withSuspense(ComponentInfoPage) },
+      { path: '/ssf/component', element: withSuspense(L2ComponentInfoPage) },
       { path: '/ssf/business', element: withSuspense(BusinessInfoPage) },
-      { path: '/ssf/function', element: withSuspense(FunctionInfoPage) },
+      { path: '/ssf/function', element: withSuspense(FeatureInfoPage) },
       { path: '/ssf/explorer', element: withSuspense(SsfExplorerPage) },
 
       { path: '/workspace/users', element: withSuspense(UsersPage) },

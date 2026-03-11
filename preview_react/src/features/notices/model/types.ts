@@ -1,5 +1,6 @@
 export interface Notice {
   id: number;
+  category: string;
   title: string;
   createdAt: string;
   views: number;

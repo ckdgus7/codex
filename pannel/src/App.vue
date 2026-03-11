@@ -28,6 +28,8 @@
         <button @click="setMakeVueFileDiffs">Vue Diffs</button>
         &nbsp;&nbsp;&nbsp;
         <button @click="setMakeReactFileHigh">React High</button>
+        &nbsp;&nbsp;&nbsp;
+        <button @click="getFigmaSpec">Figma Spec가져오기</button>
       </div>
       <div></div>
       <textarea
@@ -72,6 +74,7 @@
     runFigmaVueMake2PassHigh,
     runFigmaVueMakeDiffs,
     runFigmaReactMakeHigh,
+    runFigmaSpec,
   } from './api';
 
   const previewUrl = 'http://localhost:5174';
@@ -150,6 +153,10 @@
   async function setMakeReactFileHigh() {
     const response = await runFigmaReactMakeHigh(prompt.value);
     console.log('Figma Vue Make Response:', response.ok);
+  }
+  async function getFigmaSpec() {
+    const response = await runFigmaSpec(prompt.value);
+    console.log('Figma Spec:', response.spec);
   }
 </script>
 
