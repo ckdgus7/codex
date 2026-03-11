@@ -6,21 +6,28 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.90.21",
     "@tanstack/react-query-devtools": "^5.91.3",
+    "@toast-ui/editor": "^3.2.2",
+    "bpmn-js": "^18.13.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-router": "^7.13.1",
     "zustand": "^4.5.7"
   },
   "devDependencies": {
+    "@storybook/react": "^10.2.15",
+    "@storybook/react-vite": "^10.2.15",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^4.7.0",
+    "storybook": "^10.2.15",
     "typescript": "^5.9.3",
-    "vite": "^5.4.21"
+    "vite": "^7.3.1"
   }
 }

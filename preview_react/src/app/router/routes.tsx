@@ -1,9 +1,14 @@
 import type { RouteObject } from 'react-router';
 import { lazy, Suspense } from 'react';
+import { Layout } from '@/shared/ui/Layout';
 import { LayoutRoute } from '@/shared/ui/LayoutRoute';
 
+const SsoLoginPage = lazy(() =>
+  import('@/pages/workspace/SsoLogin').then(m => ({ default: m.SsoLoginPage })),
+);
+
 const NoticeListPage = lazy(() =>
-  import('@/pages/notices/NoticeListPage').then(m => ({ default: m.default })),
+  import('@/pages/notices/NoticeListPage').then(m => ({ default: m.NoticeListPage })),
 );
 const NoticeDetailPage = lazy(() =>
   import('@/pages/notices/NoticeDetailPage').then(m => ({ default: m.NoticeDetailPage })),
@@ -57,18 +62,24 @@ const DetailFeatureDesignPage = lazy(() =>
 const QnaPage = lazy(() =>
   import('@/pages/qna/QnaPage').then(m => ({ default: m.QnaPage })),
 );
+const QnaDetailPage = lazy(() =>
+  import('@/pages/qna/QnaDetailPage').then(m => ({ default: m.QnaDetailPage })),
+);
 
 const DomainPage = lazy(() =>
   import('@/pages/ssf/DomainPage').then(m => ({ default: m.DomainPage })),
 );
-const L2ComponentInfoPage = lazy(() =>
-  import('@/pages/ssf/L2ComponentInfoPage').then(m => ({ default: m.L2ComponentInfoPage })),
+const ComponentInfoPage = lazy(() =>
+  import('@/pages/ssf/ComponentInfoPage').then(m => ({ default: m.ComponentInfoPage })),
 );
 const BusinessInfoPage = lazy(() =>
   import('@/pages/ssf/BusinessInfoPage').then(m => ({ default: m.BusinessInfoPage })),
 );
-const FeatureInfoPage = lazy(() =>
-  import('@/pages/ssf/FeatureInfoPage').then(m => ({ default: m.FeatureInfoPage })),
+const BusinessDetailPage = lazy(() =>
+  import('@/pages/ssf/BusinessDetailPage').then(m => ({ default: m.BusinessDetailPage })),
+);
+const FunctionInfoPage = lazy(() =>
+  import('@/pages/ssf/FunctionInfoPage').then(m => ({ default: m.FunctionInfoPage })),
 );
 const SsfExplorerPage = lazy(() =>
   import('@/pages/ssf/SsfExplorerPage').then(m => ({ default: m.SsfExplorerPage })),
@@ -82,6 +93,9 @@ const TermsPage = lazy(() =>
 );
 const PrivacyPage = lazy(() =>
   import('@/pages/workspace/PrivacyPage').then(m => ({ default: m.PrivacyPage })),
+);
+const LoginErrorPage = lazy(() =>
+  import('@/pages/workspace/LoginErrorPage').then(m => ({ default: m.LoginErrorPage })),
 );
 
 const FlowManagementPage = lazy(() =>
@@ -111,6 +125,13 @@ function withSuspense(Component: React.LazyExoticComponent<React.ComponentType>)
 
 export const routes: RouteObject[] = [
   {
+    element: <Layout />,
+    children: [
+      { path: '/ssoLogin', element: withSuspense(SsoLoginPage) },
+      { path: '/login-error', element: withSuspense(LoginErrorPage) },
+    ],
+  },
+  {
     element: <LayoutRoute />,
     children: [
       { path: '/', element: withSuspense(RequirementsPage) },
@@ -135,11 +156,13 @@ export const routes: RouteObject[] = [
       { path: '/notices', element: withSuspense(NoticeListPage) },
       { path: '/notices/:id', element: withSuspense(NoticeDetailPage) },
       { path: '/qna', element: withSuspense(QnaPage) },
+      { path: '/qna/:id', element: withSuspense(QnaDetailPage) },
 
       { path: '/ssf/domain', element: withSuspense(DomainPage) },
-      { path: '/ssf/component', element: withSuspense(L2ComponentInfoPage) },
+      { path: '/ssf/component', element: withSuspense(ComponentInfoPage) },
       { path: '/ssf/business', element: withSuspense(BusinessInfoPage) },
-      { path: '/ssf/function', element: withSuspense(FeatureInfoPage) },
+      { path: '/ssf/business/:id', element: withSuspense(BusinessDetailPage) },
+      { path: '/ssf/function', element: withSuspense(FunctionInfoPage) },
       { path: '/ssf/explorer', element: withSuspense(SsfExplorerPage) },
 
       { path: '/workspace/users', element: withSuspense(UsersPage) },

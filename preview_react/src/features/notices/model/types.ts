@@ -1,32 +1,37 @@
+export type NoticeCategory = "공통" | "업무" | "서비스";
+
 export interface Notice {
-  id: number;
-  category: string;
+  no: number;
+  category: NoticeCategory;
   title: string;
+  isNew: boolean;
+  author: string;
   createdAt: string;
+  updatedAt: string;
+  attachments: number;
   views: number;
 }
 
-export interface NoticeDetail extends Notice {
-  content: string;
+export interface NoticeAttachment {
+  id: string;
+  name: string;
+  size: string;
+  downloads: number;
+  uploadedAt: string;
 }
 
-export interface NoticeQuery {
+export interface NoticeDetail {
+  no: number;
+  category: NoticeCategory;
+  isNew: boolean;
   title: string;
-  fromDate: string | null;
-  toDate: string | null;
+  content: string;
+  author: string;
+  createdAt: string;
+  updatedAt: string;
+  views: number;
+  attachments: NoticeAttachment[];
 }
 
-export interface NoticeListParams {
-  title?: string;
-  fromDate?: string;
-  toDate?: string;
-  page?: number;
-  pageSize?: number;
-}
-
-export interface NoticeListResponse {
-  items: Notice[];
-  total: number;
-  page: number;
-  totalPages: number;
-}
+export type NoticeSortKey = "no" | "category" | "title" | "author" | "createdAt" | "views";
+export type NoticeSortDir = "asc" | "desc" | null;

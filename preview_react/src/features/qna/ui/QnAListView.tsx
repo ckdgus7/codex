@@ -1,0 +1,412 @@
+import { useState, useEffect, type CSSProperties } from "react";
+import { useNavigate } from "react-router";
+import { SelectBox } from "@/shared/ui/global/SelectBox";
+import { Input } from "@/shared/ui/global/Input";
+import { Button } from "@/shared/ui/global/Button";
+import { useMdiStore } from "@/shared/model/mdi.store";
+import { usePageHeader } from "@/shared/hooks/usePageHeader";
+import { useQnAListQuery } from "@/features/qna/api/qna.queries";
+import type { QnASortKey, QnASortDir } from "@/features/qna/model/types";
+import { QnACreatePopup } from "@/features/qna/ui/QnACreatePopup";
+import { FONT, listStyles } from "@/shared/ui/styles";
+
+function SortIcon({ active, dir }: { active: boolean; dir: QnASortDir }) {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style={{ flexShrink: 0, cursor: "pointer" }}>
+      <path d="M6 7L9 4L12 7" stroke={active && dir === "asc" ? "#7a5af8" : "#a1a1aa"} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M6 11L9 14L12 11" stroke={active && dir === "desc" ? "#7a5af8" : "#a1a1aa"} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function ChevronLeftIcon({ disabled }: { disabled?: boolean }) {
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ opacity: disabled ? 0.4 : 1 }}>
+      <path d="M12 5L7 10L12 15" stroke="#71717a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function ChevronRightIcon({ disabled }: { disabled?: boolean }) {
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ opacity: disabled ? 0.4 : 1 }}>
+      <path d="M8 5L13 10L8 15" stroke="#71717a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function ChevronDoubleLeftIcon({ disabled }: { disabled?: boolean }) {
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ opacity: disabled ? 0.4 : 1 }}>
+      <path d="M11 5L6 10L11 15" stroke="#71717a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M15 5L10 10L15 15" stroke="#71717a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function ChevronDoubleRightIcon({ disabled }: { disabled?: boolean }) {
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ opacity: disabled ? 0.4 : 1 }}>
+      <path d="M5 5L10 10L5 15" stroke="#71717a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M9 5L14 10L9 15" stroke="#71717a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function DownloadIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <path d="M10 3V13M10 13L6 9M10 13L14 9" stroke="#71717a" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M3 15V16C3 16.5523 3.44772 17 4 17H16C16.5523 17 17 16.5523 17 16V15" stroke="#71717a" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function ReplyIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <path d="M6 8H14C15.1046 8 16 8.89543 16 10V14C16 15.1046 15.1046 16 14 16H6C4.89543 16 4 15.1046 4 14V10C4 8.89543 4.89543 8 6 8Z" stroke="#7a5af8" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M8 8V6C8 4.89543 8.89543 4 10 4H10C11.1046 4 12 4.89543 12 6V8" stroke="#7a5af8" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+const CATEGORY_OPTIONS = [
+  { label: "공통", value: "공통" },
+  { label: "업무", value: "업무" },
+  { label: "서비스", value: "서비스" },
+];
+
+const SEARCH_SCOPE_OPTIONS = [
+  { label: "계정", value: "계정" },
+  { label: "이용방법", value: "이용방법" },
+  { label: "기타문의", value: "기타문의" },
+];
+
+const COLUMNS: { key: QnASortKey; label: string; width: number | string; align?: "left" | "center"; sortable?: boolean }[] = [
+  { key: "no", label: "번호", width: 80, align: "center" },
+  { key: "category", label: "구분", width: 160, align: "center" },
+  { key: "title", label: "제목", width: "auto", align: "left", sortable: false },
+  { key: "author", label: "작성자", width: 120, align: "center" },
+  { key: "createdAt", label: "작성일시", width: 200, align: "center" },
+  { key: "status", label: "처리상태", width: 140, align: "center" },
+];
+
+const s = {
+  filterLeft: {
+    display: "flex",
+    alignItems: "center",
+    gap: 0,
+    width: 140,
+    flexShrink: 0,
+  } satisfies CSSProperties,
+  filterRight: {
+    display: "flex",
+    alignItems: "center",
+    gap: 8,
+    width: 484,
+    flexShrink: 0,
+  } satisfies CSSProperties,
+  titleRow: {
+    display: "flex",
+    alignItems: "center",
+    gap: 4,
+  } satisfies CSSProperties,
+  titleText: {
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+    cursor: "pointer",
+    color: "black",
+  } satisfies CSSProperties,
+  statusBadge: {
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: "2px 8px",
+    borderRadius: 4,
+    fontFamily: FONT,
+    fontSize: 12,
+    fontWeight: 500,
+    lineHeight: "16px",
+    whiteSpace: "nowrap",
+    flexShrink: 0,
+  } satisfies CSSProperties,
+};
+
+function getStatusBadgeStyle(status: string): CSSProperties {
+  if (status === "답변완료") {
+    return {
+      backgroundColor: "#ecfdf3",
+      border: "1px solid #1ac057",
+      color: "#1ac057",
+    };
+  }
+  return {
+    backgroundColor: "#f4f3ff",
+    border: "1px solid #7a5af8",
+    color: "#7a5af8",
+  };
+}
+
+export function QnAListView() {
+  const navigate = useNavigate();
+  const addTab = useMdiStore((st) => st.addTab);
+  useEffect(() => {
+    addTab({ id: "/qna", label: "Q&A", path: "/qna" });
+  }, [addTab]);
+
+  const [createPopupOpen, setCreatePopupOpen] = useState(false);
+  const [categoryFilter, setCategoryFilter] = useState("");
+  const [searchScope, setSearchScope] = useState("");
+  const [searchKeywordDraft, setSearchKeywordDraft] = useState("");
+  const [appliedKeyword, setAppliedKeyword] = useState("");
+  const [appliedScope, setAppliedScope] = useState("");
+  const [sortKey, setSortKey] = useState<QnASortKey | null>(null);
+  const [sortDir, setSortDir] = useState<QnASortDir>(null);
+  const [page, setPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  const { data, isLoading } = useQnAListQuery({
+    category: categoryFilter,
+    searchScope: appliedScope,
+    keyword: appliedKeyword,
+    page,
+    pageSize: itemsPerPage,
+    sortKey,
+    sortDir,
+  });
+
+  const totalCount = data?.total ?? 0;
+  const totalPages = data?.totalPages ?? 1;
+  const safePage = data?.page ?? 1;
+  const pageItems = data?.items ?? [];
+  const startIdx = (safePage - 1) * itemsPerPage;
+
+  const handleSort = (key: QnASortKey) => {
+    const col = COLUMNS.find((c) => c.key === key);
+    if (col?.sortable === false) return;
+    if (sortKey === key) {
+      if (sortDir === "asc") setSortDir("desc");
+      else if (sortDir === "desc") { setSortKey(null); setSortDir(null); }
+      else setSortDir("asc");
+    } else {
+      setSortKey(key);
+      setSortDir("asc");
+    }
+  };
+
+  const handleSearch = () => {
+    setAppliedKeyword(searchKeywordDraft);
+    setAppliedScope(searchScope);
+    setPage(1);
+  };
+
+  const pageNumbers: (number | string)[] = [];
+  if (totalPages <= 7) {
+    for (let i = 1; i <= totalPages; i++) pageNumbers.push(i);
+  } else {
+    pageNumbers.push(1, 2, 3, 4, 5, "...", totalPages);
+  }
+
+  usePageHeader({
+    breadcrumbItems: [{ label: "게시판" }, { label: "Q&A" }],
+    title: "Q&A",
+    favoriteKey: "Q&A",
+    actions: (
+      <Button
+        size="m"
+        variant="filled"
+        color="positive"
+        onClick={() => setCreatePopupOpen(true)}
+      >
+        등록
+      </Button>
+    ),
+  });
+
+  return (
+    <div style={listStyles.outer}>
+      <div style={listStyles.main}>
+        <div style={listStyles.filterWrap}>
+          <div style={s.filterLeft}>
+            <SelectBox
+              value={categoryFilter}
+              onChange={(v) => { setCategoryFilter(v); setPage(1); }}
+              options={CATEGORY_OPTIONS}
+              placeholder="구분"
+              wrapperStyle={{ width: 120 }}
+            />
+          </div>
+          <div style={s.filterRight}>
+            <SelectBox
+              value={searchScope}
+              onChange={setSearchScope}
+              options={SEARCH_SCOPE_OPTIONS}
+              placeholder="선택"
+              wrapperStyle={{ width: 140, flexShrink: 0 }}
+            />
+            <Input
+              value={searchKeywordDraft}
+              onChange={(e) => setSearchKeywordDraft(e.target.value)}
+              placeholder="검색어를 입력하세요."
+              prefix="search"
+              indicator={`${searchKeywordDraft.length}/20`}
+              maxLength={20}
+              style={{ flex: 1 }}
+              onKeyDown={(e) => { if (e.key === "Enter") handleSearch(); }}
+            />
+            <Button
+              size="l"
+              variant="outlined"
+              color="positive"
+              onClick={handleSearch}
+              style={{ flexShrink: 0 }}
+            >
+              검색
+            </Button>
+          </div>
+        </div>
+
+        <div style={listStyles.listWrap}>
+          <div style={{ ...listStyles.tableFunction, minHeight: 48 }}>
+            <div style={listStyles.tableFuncLeft}>
+              <span style={listStyles.badge}>총 {totalCount}개</span>
+            </div>
+            <div style={listStyles.listAction}>
+              <div style={listStyles.paginationField}>
+                <span style={listStyles.paginationLabel}>Items per page:</span>
+                <select
+                  value={itemsPerPage}
+                  onChange={(e) => { setItemsPerPage(Number(e.target.value)); setPage(1); }}
+                  style={listStyles.itemsSelect}
+                >
+                  <option value={10}>10</option>
+                  <option value={20}>20</option>
+                  <option value={50}>50</option>
+                </select>
+              </div>
+              <span style={listStyles.indicator}>
+                {totalCount === 0 ? "0" : `${startIdx + 1}-${Math.min(startIdx + itemsPerPage, totalCount)}`} of {totalCount}
+              </span>
+              <div style={listStyles.paginationWrap}>
+                <button
+                  style={{ ...listStyles.pageBtn, opacity: safePage === 1 ? 0.4 : 1 }}
+                  disabled={safePage === 1}
+                  onClick={() => setPage(1)}
+                >
+                  <ChevronDoubleLeftIcon disabled={safePage === 1} />
+                </button>
+                <button
+                  style={{ ...listStyles.pageBtn, opacity: safePage === 1 ? 0.4 : 1 }}
+                  disabled={safePage === 1}
+                  onClick={() => setPage(Math.max(1, safePage - 1))}
+                >
+                  <ChevronLeftIcon disabled={safePage === 1} />
+                </button>
+                {pageNumbers.map((pn, idx) => (
+                  <button
+                    key={idx}
+                    style={{
+                      ...listStyles.pageBtn,
+                      ...(pn === safePage ? listStyles.pageBtnActive : listStyles.pageBtnInactive),
+                    }}
+                    disabled={pn === "..."}
+                    onClick={() => { if (typeof pn === "number") setPage(pn); }}
+                  >
+                    {pn}
+                  </button>
+                ))}
+                <button
+                  style={{ ...listStyles.pageBtn, opacity: safePage === totalPages ? 0.4 : 1 }}
+                  disabled={safePage === totalPages}
+                  onClick={() => setPage(Math.min(totalPages, safePage + 1))}
+                >
+                  <ChevronRightIcon disabled={safePage === totalPages} />
+                </button>
+                <button
+                  style={{ ...listStyles.pageBtn, opacity: safePage === totalPages ? 0.4 : 1 }}
+                  disabled={safePage === totalPages}
+                  onClick={() => setPage(totalPages)}
+                >
+                  <ChevronDoubleRightIcon disabled={safePage === totalPages} />
+                </button>
+              </div>
+              <button style={listStyles.downloadBtn} title="다운로드">
+                <DownloadIcon />
+              </button>
+            </div>
+          </div>
+
+          {isLoading ? (
+            <div style={{ padding: 40, textAlign: "center", color: "#a1a1aa", fontFamily: FONT }}>
+              Loading...
+            </div>
+          ) : (
+            <table style={listStyles.table}>
+              <colgroup>
+                {COLUMNS.map((col) => (
+                  <col
+                    key={col.key}
+                    style={{ width: typeof col.width === "number" ? col.width : undefined }}
+                  />
+                ))}
+              </colgroup>
+              <thead>
+                <tr>
+                  {COLUMNS.map((col) => (
+                    <th
+                      key={col.key}
+                      style={listStyles.th}
+                      onClick={() => handleSort(col.key)}
+                    >
+                      <div style={listStyles.thInner}>
+                        <span>{col.label}</span>
+                        {col.sortable !== false && (
+                          <SortIcon active={sortKey === col.key} dir={sortKey === col.key ? sortDir : null} />
+                        )}
+                      </div>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {pageItems.length === 0 ? (
+                  <tr>
+                    <td colSpan={COLUMNS.length} style={{ ...listStyles.td, padding: 40, color: "#a1a1aa" }}>
+                      데이터가 없습니다.
+                    </td>
+                  </tr>
+                ) : (
+                  pageItems.map((item) => (
+                    <tr key={item.no} style={{ cursor: "pointer" }} onClick={() => navigate(`/qna/${item.no}`)}>
+                      <td style={listStyles.td}>{item.no}</td>
+                      <td style={listStyles.td}>{item.category}</td>
+                      <td style={{ ...listStyles.td, ...listStyles.tdLeft }}>
+                        <div style={s.titleRow}>
+                          <span style={s.titleText}>{item.title}</span>
+                          {item.hasReply && <ReplyIcon />}
+                        </div>
+                      </td>
+                      <td style={listStyles.td}>{item.author}</td>
+                      <td style={listStyles.td}>{item.createdAt}</td>
+                      <td style={listStyles.td}>
+                        <span style={{ ...s.statusBadge, ...getStatusBadgeStyle(item.status) }}>
+                          {item.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          )}
+        </div>
+      </div>
+      <QnACreatePopup
+        open={createPopupOpen}
+        onClose={() => setCreatePopupOpen(false)}
+      />
+    </div>
+  );
+}
