@@ -1,0 +1,10 @@
+﻿const fs = require('fs');
+const text = fs.readFileSync('src/shared/ui/LayoutRoute.tsx', 'utf8');
+const repaired = Buffer.from(text, 'latin1').toString('utf8');
+const count = (s, r) => (s.match(r) || []).length;
+console.log('origHangul', count(text, /[가-힣]/g));
+console.log('origMojibake', count(text, /[ìëêíó源諛媛뺤붽]/g));
+console.log('hasQuestionSeq', /\?[가-힣]/.test(text));
+console.log('repHangul', count(repaired, /[가-힣]/g));
+console.log('repMojibake', count(repaired, /[ìëêíó源諛媛뺤붽]/g));
+console.log(repaired.slice(0, 500));

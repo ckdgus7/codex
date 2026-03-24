@@ -1,4 +1,4 @@
-[
+﻿[
   {
     "id": "1",
     "gnbName": "요구관리",
@@ -52,15 +52,25 @@
   },
   {
     "id": "6",
-    "gnbName": "워크스페이스",
+    "gnbName": "SBF 관리",
     "lnb": [
-      { "name": "사용자 관리", "path": "/workspace/users" },
-      { "name": "사이트 이용약관 관리", "path": "/workspace/terms" },
-      { "name": "개인정보 처리방침 관리", "path": "/workspace/privacy" }
+      { "name": "Lifecycle(D1) 관리", "path": "/sbf/lifecycle" },
+      { "name": "업무영역(D2) 관리", "path": "/sbf/business-area" },
+      { "name": "업무Flow(D3) 관리", "path": "/sbf/business-flow" },
+      { "name": "SBF 탐색기", "path": "/sbf/explorer" }
     ]
   },
   {
     "id": "7",
+    "gnbName": "워크스페이스",
+    "lnb": [
+      { "name": "사용자관리", "path": "/workspace/users" },
+      { "name": "서비스 이용약관 관리", "path": "/workspace/terms" },
+      { "name": "개인정보 처리방침 관리", "path": "/workspace/privacy" }
+    ]
+  },
+  {
+    "id": "8",
     "gnbName": "업무 기준 정보 관리",
     "lnb": [
       { "name": "업무Flow 관리", "path": "/business-info/flow" },

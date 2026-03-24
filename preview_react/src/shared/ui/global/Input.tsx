@@ -1,5 +1,8 @@
 import { useState, type CSSProperties, type InputHTMLAttributes, type ReactNode } from "react";
 
+const cx = (...classes: Array<string | false | null | undefined>) =>
+  classes.filter(Boolean).join(" ");
+
 type InputSize = "m";
 type InputPrefix = "search";
 
@@ -42,62 +45,11 @@ interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "size" 
   wrapperStyle?: CSSProperties;
 }
 
-const FONT_FAMILY = "'Pretendard', sans-serif";
-
-const COLORS = {
-  label: "#a1a1aa",
-  requiredMark: "#36bffa",
-  borderDefault: "#e4e7ec",
-  borderFocus: "#7a5af8",
-  borderError: "#f04438",
-  background: "#ffffff",
-  placeholder: "#a1a1aa",
-  text: "#18181b",
-  indicator: "#a1a1aa",
-  errorText: "#f04438",
-  disabledBg: "#fafafa",
-};
-
-const SIZE_CONFIG: Record<
-  InputSize,
-  {
-    height: number;
-    padding: number;
-    gap: number;
-    iconSize: number;
-    fontSize: number;
-    fontWeight: number;
-    lineHeight: string;
-    inputPaddingX: number;
-    indicatorFontSize: number;
-    indicatorLineHeight: string;
-    indicatorPaddingX: number;
-    labelFontSize: number;
-    labelFontWeight: number;
-    labelLineHeight: string;
-    labelGap: number;
-    fieldGap: number;
-    requiredMarkSize: number;
-  }
-> = {
+const SIZE_CLASSES: Record<InputSize, { field: string; icon: string; input: string }> = {
   m: {
-    height: 40,
-    padding: 8,
-    gap: 8,
-    iconSize: 24,
-    fontSize: 16,
-    fontWeight: 400,
-    lineHeight: "24px",
-    inputPaddingX: 8,
-    indicatorFontSize: 12,
-    indicatorLineHeight: "18px",
-    indicatorPaddingX: 4,
-    labelFontSize: 14,
-    labelFontWeight: 500,
-    labelLineHeight: "18px",
-    labelGap: 4,
-    fieldGap: 8,
-    requiredMarkSize: 6,
+    field: "h-10 gap-2 p-2",
+    icon: "h-6 w-6",
+    input: "text-base font-normal leading-6",
   },
 };
 
@@ -119,153 +71,39 @@ export function Input({
   ...rest
 }: InputProps) {
   const [focused, setFocused] = useState(false);
-  const config = SIZE_CONFIG[size];
-
   const resolvedLeftIcon = leftIcon ?? (prefix ? PREFIX_MAP[prefix] : undefined);
-
-  const borderColor = error
-    ? COLORS.borderError
-    : focused
-      ? COLORS.borderFocus
-      : COLORS.borderDefault;
-
-  const wrapperBaseStyle: CSSProperties = {
-    display: "flex",
-    flexDirection: "column",
-    gap: config.fieldGap,
-    alignItems: "flex-start",
-    width: "100%",
-    ...wrapperStyle,
-  };
-
-  const labelRowStyle: CSSProperties = {
-    display: "flex",
-    alignItems: "center",
-  };
-
-  const labelContainerStyle: CSSProperties = {
-    display: "flex",
-    gap: config.labelGap,
-    alignItems: "center",
-    justifyContent: "center",
-  };
-
-  const labelTextStyle: CSSProperties = {
-    fontFamily: FONT_FAMILY,
-    fontSize: config.labelFontSize,
-    fontWeight: config.labelFontWeight,
-    lineHeight: config.labelLineHeight,
-    color: COLORS.label,
-    whiteSpace: "nowrap",
-  };
-
-  const requiredMarkStyle: CSSProperties = {
-    width: config.requiredMarkSize,
-    height: config.requiredMarkSize,
-    borderRadius: 3,
-    backgroundColor: COLORS.requiredMark,
-    flexShrink: 0,
-  };
-
-  const fieldBaseStyle: CSSProperties = {
-    display: "flex",
-    alignItems: "center",
-    gap: config.gap,
-    padding: config.padding,
-    height: config.height,
-    backgroundColor: disabled ? COLORS.disabledBg : COLORS.background,
-    border: `1px solid ${borderColor}`,
-    borderRadius: 4,
-    boxSizing: "border-box",
-    width: "100%",
-    opacity: disabled ? 0.6 : 1,
-    transition: "border-color 0.15s ease",
-    ...style,
-  };
-
-  const leftAreaStyle: CSSProperties = {
-    display: "flex",
-    flex: "1 0 0",
-    alignItems: "center",
-    minWidth: 0,
-    minHeight: 0,
-  };
-
-  const iconStyle: CSSProperties = {
-    display: "flex",
-    alignItems: "center",
-    flexShrink: 0,
-    width: config.iconSize,
-    height: config.iconSize,
-    overflow: "hidden",
-  };
-
-  const inputTextWrapStyle: CSSProperties = {
-    display: "flex",
-    flex: "1 0 0",
-    alignItems: "center",
-    minWidth: 0,
-    minHeight: 0,
-    paddingLeft: config.inputPaddingX,
-    paddingRight: config.inputPaddingX,
-  };
-
-  const inputStyle: CSSProperties = {
-    fontFamily: FONT_FAMILY,
-    fontSize: config.fontSize,
-    fontWeight: config.fontWeight,
-    lineHeight: config.lineHeight,
-    color: COLORS.text,
-    border: "none",
-    outline: "none",
-    background: "transparent",
-    width: "100%",
-    padding: 0,
-    margin: 0,
-    boxSizing: "border-box",
-  };
-
-  const indicatorStyle: CSSProperties = {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "flex-end",
-    paddingLeft: config.indicatorPaddingX,
-    paddingRight: config.indicatorPaddingX,
-    flexShrink: 0,
-    fontFamily: FONT_FAMILY,
-    fontSize: config.indicatorFontSize,
-    fontWeight: 400,
-    lineHeight: config.indicatorLineHeight,
-    color: COLORS.indicator,
-    whiteSpace: "nowrap",
-  };
-
-  const helperTextStyle: CSSProperties = {
-    fontFamily: FONT_FAMILY,
-    fontSize: 12,
-    fontWeight: 400,
-    lineHeight: "18px",
-    color: error ? COLORS.errorText : COLORS.indicator,
-    paddingLeft: 4,
-  };
+  const sizeClasses = SIZE_CLASSES[size];
 
   return (
-    <div style={wrapperBaseStyle}>
+    <div className="flex w-full flex-col items-start gap-2" style={wrapperStyle}>
       {label && (
-        <div style={labelRowStyle}>
-          <div style={labelContainerStyle}>
-            <span style={labelTextStyle}>{label}</span>
-            {required && <span style={requiredMarkStyle} />}
+        <div className="flex items-center">
+          <div className="flex items-center justify-center gap-1">
+            <span className="whitespace-nowrap font-sans text-sm font-medium leading-[18px] text-[#a1a1aa]">{label}</span>
+            {required && <span className="h-1.5 w-1.5 shrink-0 rounded-[3px] bg-[#36bffa]" />}
           </div>
         </div>
       )}
-      <div style={fieldBaseStyle}>
-        <div style={leftAreaStyle}>
-          {resolvedLeftIcon && <span style={iconStyle}>{resolvedLeftIcon}</span>}
-          <div style={inputTextWrapStyle}>
+      <div
+        className={cx(
+          "flex w-full items-center rounded border bg-white box-border transition-colors duration-150 ease-in-out",
+          error ? "border-[#f04438]" : focused ? "border-[#7a5af8]" : "border-[#e4e7ec]",
+          disabled && "bg-[#fafafa] opacity-60",
+          sizeClasses.field
+        )}
+        style={style}
+      >
+        <div className="flex min-w-0 flex-1 items-center">
+          {resolvedLeftIcon && (
+            <span className={cx("flex shrink-0 items-center overflow-hidden", sizeClasses.icon)}>{resolvedLeftIcon}</span>
+          )}
+          <div className="flex min-w-0 flex-1 items-center px-2">
             <input
               disabled={disabled}
-              style={inputStyle}
+              className={cx(
+                "m-0 w-full border-none bg-transparent p-0 font-sans text-[#18181b] outline-none box-border placeholder:text-[#a1a1aa]",
+                sizeClasses.input
+              )}
               onFocus={(e) => {
                 setFocused(true);
                 onFocus?.(e);
@@ -278,10 +116,18 @@ export function Input({
             />
           </div>
         </div>
-        {indicator != null && <span style={indicatorStyle}>{indicator}</span>}
-        {rightIcon && <span style={iconStyle}>{rightIcon}</span>}
+        {indicator != null && (
+          <span className="flex shrink-0 items-center justify-end whitespace-nowrap px-1 font-sans text-xs font-normal leading-[18px] text-[#a1a1aa]">
+            {indicator}
+          </span>
+        )}
+        {rightIcon && <span className={cx("flex shrink-0 items-center overflow-hidden", sizeClasses.icon)}>{rightIcon}</span>}
       </div>
-      {helperText && <span style={helperTextStyle}>{helperText}</span>}
+      {helperText && (
+        <span className={cx("pl-1 font-sans text-xs font-normal leading-[18px]", error ? "text-[#f04438]" : "text-[#a1a1aa]")}>
+          {helperText}
+        </span>
+      )}
     </div>
   );
 }

@@ -1,130 +1,10 @@
 import { useRef, useState, useEffect, useCallback } from "react";
-import type { CSSProperties } from "react";
 import { useNavigate } from "react-router";
 import { useMdiStore } from "@/shared/model/mdi.store";
 import type { MdiTabItem } from "@/shared/model/mdi.store";
 
-const styles = {
-  wrapper: {
-    display: "flex",
-    alignItems: "center",
-    flex: 1,
-    minWidth: 0,
-    height: 36,
-    background: "#fafafa",
-    fontFamily: "'Pretendard', sans-serif",
-    boxSizing: "border-box",
-  } satisfies CSSProperties,
-  tabListWrap: {
-    display: "flex",
-    alignItems: "center",
-    flex: 1,
-    minWidth: 0,
-    overflow: "hidden",
-  } satisfies CSSProperties,
-  tabList: {
-    display: "flex",
-    alignItems: "flex-start",
-    overflow: "hidden",
-  } satisfies CSSProperties,
-  tab: {
-    display: "flex",
-    alignItems: "center",
-    gap: 8,
-    maxWidth: 240,
-    padding: "8px 16px",
-    background: "#ffffff",
-    borderRight: "1px solid #e4e4e7",
-    borderBottom: "1px solid #e4e4e7",
-    cursor: "pointer",
-    boxSizing: "border-box",
-    height: 36,
-    flexShrink: 0,
-  } satisfies CSSProperties,
-  tabActive: {
-    display: "flex",
-    alignItems: "center",
-    gap: 8,
-    maxWidth: 240,
-    padding: "8px 16px",
-    background: "#ffffff",
-    borderRight: "1px solid #e4e4e7",
-    borderBottom: "2px solid #18181b",
-    cursor: "pointer",
-    boxSizing: "border-box",
-    height: 36,
-    flexShrink: 0,
-  } satisfies CSSProperties,
-  tabLabel: {
-    fontSize: 14,
-    fontWeight: 400,
-    color: "#a1a1aa",
-    lineHeight: "20px",
-    maxWidth: 156,
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
-    fontFamily: "'Pretendard', sans-serif",
-  } satisfies CSSProperties,
-  tabLabelActive: {
-    fontSize: 14,
-    fontWeight: 400,
-    color: "#18181b",
-    lineHeight: "20px",
-    maxWidth: 156,
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
-    fontFamily: "'Pretendard', sans-serif",
-  } satisfies CSSProperties,
-  closeBtn: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    width: 16,
-    height: 16,
-    padding: 0,
-    border: "none",
-    background: "transparent",
-    cursor: "pointer",
-    flexShrink: 0,
-  } satisfies CSSProperties,
-  btnWrap: {
-    display: "flex",
-    alignItems: "center",
-    gap: 0,
-    flexShrink: 0,
-    marginLeft: "auto",
-  } satisfies CSSProperties,
-  separator: {
-    width: 1,
-    height: 20,
-    background: "#e4e4e7",
-    marginLeft: 8,
-    marginRight: 4,
-  } satisfies CSSProperties,
-  navBtn: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    width: 28,
-    height: 28,
-    border: "none",
-    background: "transparent",
-    cursor: "pointer",
-    padding: 0,
-    borderRadius: 4,
-  } satisfies CSSProperties,
-  emptyMessage: {
-    display: "flex",
-    alignItems: "center",
-    height: "100%",
-    paddingLeft: 16,
-    fontSize: 12,
-    color: "#a1a1aa",
-    fontFamily: "'Pretendard', sans-serif",
-  } satisfies CSSProperties,
-};
+const cx = (...classes: Array<string | false | null | undefined>) =>
+  classes.filter(Boolean).join(" ");
 
 function CloseIcon({ color = "#a1a1aa" }: { color?: string }) {
   return (
@@ -209,35 +89,40 @@ export function MdiTab({ className }: MdiTabProps) {
 
   if (tabs.length === 0) {
     return (
-      <div style={styles.wrapper} className={className}>
-        <div style={styles.emptyMessage}>열린 탭이 없습니다.</div>
+      <div className={cx("flex h-9 min-w-0 flex-1 items-center bg-[#fafafa] font-sans box-border", className)}>
+        <div className="h-full pl-4 text-xs text-[#a1a1aa]">?�린 ??�� ?�습?�다.</div>
       </div>
     );
   }
 
   return (
-    <div style={styles.wrapper} className={className}>
-      <div style={styles.tabListWrap}>
-        <div
-          ref={tabListRef}
-          style={styles.tabList}
-          onScroll={checkScroll}
-        >
+    <div className={cx("flex h-9 min-w-0 flex-1 items-center bg-[#fafafa] font-sans box-border", className)}>
+      <div className="flex min-w-0 flex-1 items-center overflow-hidden">
+        <div ref={tabListRef} className="flex items-start overflow-hidden" onScroll={checkScroll}>
           {tabs.map((tab) => {
             const isActive = tab.id === activeTabId;
             return (
               <div
                 key={tab.id}
-                style={isActive ? styles.tabActive : styles.tab}
+                className={cx(
+                  "flex h-9 max-w-[240px] shrink-0 cursor-pointer items-center gap-2 bg-white px-4 py-2 box-border",
+                  "border-r border-[#e4e4e7]",
+                  isActive ? "border-b-2 border-b-[#18181b]" : "border-b border-b-[#e4e4e7]"
+                )}
                 onClick={() => handleTabClick(tab)}
               >
-                <span style={isActive ? styles.tabLabelActive : styles.tabLabel}>
+                <span
+                  className={cx(
+                    "max-w-[156px] overflow-hidden text-ellipsis whitespace-nowrap font-sans text-sm font-normal leading-5",
+                    isActive ? "text-[#18181b]" : "text-[#a1a1aa]"
+                  )}
+                >
                   {tab.label}
                 </span>
                 <button
-                  style={styles.closeBtn}
+                  className="flex h-4 w-4 shrink-0 items-center justify-center border-none bg-transparent p-0"
                   onClick={(e) => handleClose(e, tab.id)}
-                  title="닫기"
+                  title="?�기"
                 >
                   <CloseIcon color={isActive ? "#71717a" : "#a1a1aa"} />
                 </button>
@@ -247,27 +132,27 @@ export function MdiTab({ className }: MdiTabProps) {
         </div>
       </div>
       {(canScrollLeft || canScrollRight) && (
-        <div style={styles.btnWrap}>
-          <div style={styles.separator} />
+        <div className="ml-auto flex shrink-0 items-center gap-0">
+          <div className="mx-1 h-5 w-px bg-[#e4e4e7]" />
           <button
-            style={{
-              ...styles.navBtn,
-              opacity: canScrollLeft ? 1 : 0.3,
-            }}
+            className={cx(
+              "flex h-7 w-7 items-center justify-center rounded border-none bg-transparent p-0",
+              canScrollLeft ? "opacity-100" : "opacity-30"
+            )}
             onClick={() => scrollTabs("left")}
             disabled={!canScrollLeft}
-            title="이전"
+            title="?�전"
           >
             <ChevronLeftIcon />
           </button>
           <button
-            style={{
-              ...styles.navBtn,
-              opacity: canScrollRight ? 1 : 0.3,
-            }}
+            className={cx(
+              "flex h-7 w-7 items-center justify-center rounded border-none bg-transparent p-0",
+              canScrollRight ? "opacity-100" : "opacity-30"
+            )}
             onClick={() => scrollTabs("right")}
             disabled={!canScrollRight}
-            title="다음"
+            title="?�음"
           >
             <ChevronRightIcon />
           </button>

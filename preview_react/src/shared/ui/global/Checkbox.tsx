@@ -1,5 +1,8 @@
 import { type CSSProperties } from "react";
 
+const cx = (...classes: Array<string | false | null | undefined>) =>
+  classes.filter(Boolean).join(" ");
+
 type CheckboxSize = "l" | "m" | "s";
 
 interface CheckboxProps {
@@ -11,49 +14,35 @@ interface CheckboxProps {
   style?: CSSProperties;
 }
 
-const FONT_FAMILY = "'Pretendard', sans-serif";
-
-const COLORS = {
-  checkedBg: "#7a5af8",
-  uncheckedBg: "#ffffff",
-  uncheckedBorder: "#e4e7ec",
-  disabledBg: "#71717a",
-  checkmark: "#ffffff",
-  labelText: "#3f3f46",
+const SIZE_CLASSES: Record<CheckboxSize, { box: string; check: string; label: string }> = {
+  l: {
+    box: "h-6 w-6 rounded",
+    check: "h-[10px] w-[14px]",
+    label: "text-base font-normal leading-6",
+  },
+  m: {
+    box: "h-5 w-5 rounded",
+    check: "h-[9px] w-3",
+    label: "text-sm font-normal leading-5",
+  },
+  s: {
+    box: "h-[18px] w-[18px] rounded-[3px]",
+    check: "h-2 w-[10px]",
+    label: "text-xs font-normal leading-[18px]",
+  },
 };
 
-const SIZE_CONFIG: Record<
-  CheckboxSize,
-  {
-    box: number;
-    borderRadius: number;
-    checkmarkWidth: number;
-    checkmarkHeight: number;
-    strokeWidth: number;
-    fontSize: number;
-    lineHeight: string;
-    gap: number;
-  }
-> = {
-  l: { box: 24, borderRadius: 4, checkmarkWidth: 14, checkmarkHeight: 10, strokeWidth: 2, fontSize: 16, lineHeight: "24px", gap: 8 },
-  m: { box: 20, borderRadius: 4, checkmarkWidth: 12, checkmarkHeight: 9, strokeWidth: 2, fontSize: 14, lineHeight: "20px", gap: 8 },
-  s: { box: 18, borderRadius: 3, checkmarkWidth: 10, checkmarkHeight: 8, strokeWidth: 1.5, fontSize: 12, lineHeight: "18px", gap: 8 },
-};
-
-function CheckmarkIcon({ size, color }: { size: CheckboxSize; color: string }) {
-  const config = SIZE_CONFIG[size];
+function CheckmarkIcon({ size }: { size: CheckboxSize }) {
   return (
     <svg
-      width={config.checkmarkWidth}
-      height={config.checkmarkHeight}
+      className={SIZE_CLASSES[size].check}
       viewBox="0 0 14 10"
       fill="none"
-      style={{ display: "block" }}
     >
       <path
         d="M1 5L5 9L13 1"
-        stroke={color}
-        strokeWidth={config.strokeWidth}
+        stroke="#ffffff"
+        strokeWidth={size === "s" ? 1.5 : 2}
         strokeLinecap="round"
         strokeLinejoin="round"
       />
@@ -69,61 +58,31 @@ export function Checkbox({
   disabled = false,
   style,
 }: CheckboxProps) {
-  const config = SIZE_CONFIG[size];
-
-  const containerStyle: CSSProperties = {
-    display: "flex",
-    gap: config.gap,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 4,
-    cursor: disabled ? "not-allowed" : "pointer",
-    userSelect: "none",
-    ...style,
-  };
-
-  const boxStyle: CSSProperties = {
-    width: config.box,
-    height: config.box,
-    borderRadius: config.borderRadius,
-    flexShrink: 0,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    boxSizing: "border-box",
-    ...(checked
-      ? {
-          backgroundColor: disabled ? COLORS.disabledBg : COLORS.checkedBg,
-          opacity: disabled ? 0.6 : 1,
-        }
-      : {
-          backgroundColor: COLORS.uncheckedBg,
-          border: `1px solid ${COLORS.uncheckedBorder}`,
-          opacity: disabled ? 0.6 : 1,
-        }),
-  };
-
-  const labelStyle: CSSProperties = {
-    fontFamily: FONT_FAMILY,
-    fontSize: config.fontSize,
-    fontWeight: 400,
-    lineHeight: config.lineHeight,
-    color: COLORS.labelText,
-    whiteSpace: "nowrap",
-  };
-
-  const handleClick = () => {
-    if (!disabled) {
-      onChange(!checked);
-    }
-  };
+  const sizeClasses = SIZE_CLASSES[size];
 
   return (
-    <div style={containerStyle} onClick={handleClick}>
-      <div style={boxStyle}>
-        {checked && <CheckmarkIcon size={size} color={COLORS.checkmark} />}
+    <div
+      className={cx(
+        "flex select-none items-center justify-center gap-2 rounded cursor-pointer",
+        disabled && "cursor-not-allowed opacity-60"
+      )}
+      style={style}
+      onClick={() => {
+        if (!disabled) {
+          onChange(!checked);
+        }
+      }}
+    >
+      <div
+        className={cx(
+          "flex shrink-0 items-center justify-center box-border",
+          sizeClasses.box,
+          checked ? (disabled ? "bg-[#71717a]" : "bg-[#7a5af8]") : "border border-[#e4e7ec] bg-white"
+        )}
+      >
+        {checked && <CheckmarkIcon size={size} />}
       </div>
-      {label && <span style={labelStyle}>{label}</span>}
+      {label && <span className={cx("whitespace-nowrap font-sans text-[#3f3f46]", sizeClasses.label)}>{label}</span>}
     </div>
   );
 }

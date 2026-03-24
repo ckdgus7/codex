@@ -69,6 +69,13 @@ vite.config.ts  - Vite configuration
 - 기능(L4)정보 관리 `/ssf/function`
 - SSF탐색기 `/ssf/explorer`
 
+### SBF관리
+- **API Layer** (`src/features/sbf/api/`): TanStack Query hooks wrapping mock data getters. `lifecycle.queries.ts` (useLifecycleListQuery, useLifecycleDetailQuery). Query key namespace via `lifecycleKeys`.
+- **Model** (`src/features/sbf/model/`): `types.ts` (LifecycleItem, LifecycleSortKey, SortDir), `mock-data.ts` (13 mock rows, getLifecycleList, getLifecycleDetail).
+- Lifecycle(D1) 관리 `/sbf/lifecycle` (fully implemented, file: `src/features/sbf/ui/d1/LifecycleListView.tsx`. Filter bar with ChooseButton (전체/사용/미사용) + search input (ID/명 검색), data table with 6 columns: No/Lifecycle ID/Lifecycle명(한글)/Lifecycle명(영문)/설명/사용여부, column sorting, 사용여부 badges, pagination, 13 mock rows, "Lifecycle(D1) 신규 등록" button in PageHeader)
+- 업무영역(D2) 관리 `/sbf/business-area` (BlankPage)
+- 업무Flow(D3) 관리 `/sbf/business-flow` (BlankPage)
+
 ### 워크스페이스
 - 사용자 관리 `/workspace/users`
 - 사이트 이용약관 관리 `/workspace/terms`
@@ -201,6 +208,13 @@ src/
 * Features must depend only on shared, and direct dependencies on other features are prohibited.
 * Pages should only compose features and must not be aware of their internal implementations.
 * For data integration such as APIs, create a features/api folder and implement it using @tanstack/react-query.
+* When adding screen or popup files, check the Figma design and the existing files in parallel.
+* Refer to similar screens or popups.
+* Refer to similar script functionality and interactions in the existing files.
+* Analyze the Figma node spec structure as deeply as possible.
+* When a file is created under the `pages/` folder, add a route to `src/app/router/routes.tsx`.
+* Create separate JSON files for each section of data used by screens or popups, so that even when real APIs are integrated later, the frontend can simply call them via `fetch` and only update the URL and the request/response data spec, making backend integration easier.
+* Please refer to existing screens with similar patterns for interactions, events, `AlertModal`, `Snackbar`, and screen-to-popup connections, and apply any necessary parts when building the screen.
 
 
 ---

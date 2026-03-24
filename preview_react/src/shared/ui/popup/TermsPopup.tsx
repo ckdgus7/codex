@@ -1,6 +1,4 @@
-import type { CSSProperties } from "react";
-import { Button } from "@/shared/ui/global/Button";
-import { popupStyles } from "@/shared/ui/styles";
+﻿import { Button } from "@/shared/ui/global/Button";
 
 interface TermsPopupProps {
   open: boolean;
@@ -16,178 +14,66 @@ function CloseIcon() {
   );
 }
 
-const FONT = "'Pretendard', sans-serif";
-
-const s = {
-  overlay: {
-    ...popupStyles.overlay,
-  } satisfies CSSProperties,
-  popup: {
-    ...popupStyles.popup,
-    maxHeight: "90vh",
-  } satisfies CSSProperties,
-  header: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 12,
-    paddingTop: 32,
-    paddingLeft: 32,
-    paddingRight: 32,
-    paddingBottom: 16,
-    flexShrink: 0,
-  } satisfies CSSProperties,
-  titleRow: {
-    ...popupStyles.titleRow,
-    marginBottom: undefined,
-    width: "100%",
-  } satisfies CSSProperties,
-  titleText: {
-    ...popupStyles.titleText,
-    color: "#52525b",
-  } satisfies CSSProperties,
-  closeBtn: popupStyles.closeBtn,
-  main: {
-    flex: 1,
-    overflowY: "auto",
-    padding: "24px 32px",
-  } satisfies CSSProperties,
-  content: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 24,
-    paddingBottom: 24,
-  } satisfies CSSProperties,
-  chapterTitle: {
-    fontFamily: FONT,
-    fontSize: 16,
-    fontWeight: 700,
-    lineHeight: "24px",
-    color: "#000000",
-  } satisfies CSSProperties,
-  articleWrap: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 16,
-  } satisfies CSSProperties,
-  articleTitle: {
-    fontFamily: FONT,
-    fontSize: 20,
-    fontWeight: 400,
-    lineHeight: "32px",
-    color: "#000000",
-  } satisfies CSSProperties,
-  articleBody: {
-    fontFamily: FONT,
-    fontSize: 16,
-    fontWeight: 400,
-    lineHeight: "24px",
-    color: "#3f3f46",
-  } satisfies CSSProperties,
-  articleBodyCol: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 8,
-  } satisfies CSSProperties,
-  orderedList: {
-    fontFamily: FONT,
-    fontSize: 16,
-    fontWeight: 400,
-    lineHeight: "24px",
-    color: "#3f3f46",
-    margin: 0,
-    paddingLeft: 24,
-  } satisfies CSSProperties,
-  listItem: {
-    marginBottom: 0,
-  } satisfies CSSProperties,
-  footer: {
-    ...popupStyles.footer,
-    padding: undefined,
-    borderTop: undefined,
-    paddingTop: 16,
-    paddingBottom: 32,
-    paddingLeft: 32,
-    paddingRight: 32,
-  } satisfies CSSProperties,
-};
-
 export function TermsPopup({ open, onClose }: TermsPopupProps) {
   if (!open) return null;
 
   return (
-    <div style={s.overlay} onClick={onClose}>
-      <div style={s.popup} onClick={(e) => e.stopPropagation()}>
-        <div style={s.header}>
-          <div style={s.titleRow}>
-            <span style={s.titleText}>서비스 이용약관</span>
-            <button style={s.closeBtn} onClick={onClose}>
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50" onClick={onClose}>
+      <div
+        className="flex max-h-[90vh] w-[880px] max-w-[calc(100vw-32px)] flex-col overflow-hidden rounded-2xl bg-white shadow-[0_8px_32px_rgba(0,0,0,0.12)] font-sans"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="shrink-0 px-8 pb-4 pt-8">
+          <div className="flex w-full items-center justify-between">
+            <span className="text-2xl font-bold leading-8 text-[#52525b]">서비스 이용약관</span>
+            <button className="flex h-8 w-8 items-center justify-center rounded bg-transparent p-0" onClick={onClose} aria-label="닫기">
               <CloseIcon />
             </button>
           </div>
         </div>
 
-        <div style={s.main}>
-          <div style={s.content}>
-            <span style={s.chapterTitle}>제1장 총칙</span>
+        <div className="flex-1 overflow-y-auto px-8 py-6">
+          <div className="flex flex-col gap-6 pb-6">
+            <span className="text-base font-bold leading-6 text-black">주요 조항</span>
 
-            <div style={s.articleWrap}>
-              <span style={s.articleTitle}>제 1 조 (목적)</span>
-              <p style={s.articleBody}>
-                {`본 약관은 회원이 개별 서비스의 아이디(ID)를 통합하여 하나의 ID로 사용할 수 있도록 에스케이텔레콤 주식회사(이하 "회사")가 제공하는 "T ID" 서비스를 이용하는 데 필요한 회원과 회사 간의 권리, 의무 및 책임사항, 이용조건 및 절차 등 기본적인 사항을 규정함을 목적으로 합니다.`}
+            <section className="flex flex-col gap-4">
+              <span className="text-[20px] font-normal leading-8 text-black">제1조 (목적)</span>
+              <p className="m-0 text-base font-normal leading-6 text-[#3f3f46]">
+                본 약관은 NOVA AI DevOps 서비스의 이용과 관련하여 회사와 이용자 간의 권리, 의무 및 책임사항을 규정함을 목적으로 합니다.
               </p>
-            </div>
+            </section>
 
-            <div style={s.articleWrap}>
-              <span style={s.articleTitle}>제 2 조 (용어의 정의)</span>
-              <div style={s.articleBodyCol}>
-                <p style={s.articleBody}>
-                  ① 본 약관에서 사용하는 용어의 정의는 다음과 같습니다.
-                </p>
-                <ol style={s.orderedList}>
-                  <li style={s.listItem}>
-                    T ID : 회사 또는 관계사가 제공하는 개별 서비스를 통합된 하나의 ID 계정으로 회원 인증, 회원정보 변경, 회원 가입 및 탈퇴 등을 관리할 수 있도록 회사가 제공하는 서비스를 말합니다.
-                  </li>
-                  <li style={s.listItem}>
-                    회원 : T ID가 적용된 개별 서비스 또는 T ID 사이트에서 본 약관에 동의하고, ID와 Password(비밀번호)를 발급 받은 고객을 말합니다. 회원의 자격 및 권한 등은 본 약관에서 정한 바에 따라 일부 제한될 수 있습니다.
-                  </li>
-                  <li style={s.listItem}>
-                    관계사 : 회사와 제휴 관계를 맺고 T ID를 공동 제공하기로 합의한 법인을 말합니다. 개별 관계사는 추후 추가/변동될 수 있으며 관계사가 추가/변동될 때에는 본 약관에서 정한 방식으로 회원에게 공지합니다.
-                  </li>
-                  <li style={s.listItem}>
-                    개별 서비스 : T ID를 이용하여 접속 가능한 서비스를 말합니다. 개별 서비스는 추후 추가/변동될 수 있으며 서비스가 추가/변동될 때에는 본 약관에서 정한 방식으로 회원에게 공지합니다.
-                  </li>
-                  <li style={s.listItem}>
-                    {`아이디 ("ID") : T ID를 통해 개별 서비스에 동일하게 사용할 수 있는 ID로 회원 식별과 회원의 서비스 이용을 위해 회원이 선정하고 회사가 승인하는 영문자, 숫자 및 특수문자의 조합을 의미하며, 회사는 일관된 ID정책을 위해 특정 유형의 ID를 회원이 선정하도록 사전에 정할 수 있습니다.`}
-                  </li>
-                  <li style={s.listItem}>
-                    비밀번호("Password") : 회원의 정보보호를 위해 회원 자신이 설정한 문자, 숫자 및 특수문자의 조합을 의미합니다.
-                  </li>
-                  <li style={s.listItem}>
-                    T ID 사이트 : T ID 서비스를 제공하는 온라인 기반 유무선 홈페이지를 말합니다. (http://www.skt-id.co.kr, T ID 앱 등)
-                  </li>
-                  <li style={s.listItem}>
-                    T ID 제공화면 : 회원이 개별 서비스 등에서 T ID 가입 등의 행위를 할 때 제공되는 화면을 말합니다.
-                  </li>
-                  <li style={s.listItem}>
-                    공통관리정보 : T ID를 이용하기 위해 회사가 정한 가입절차에 따라 입력한 ID 정보와 필수 입력 항목으로 T ID 사이트를 통해 정보확인, 변경처리 등을 관리할 수 있는 회원정보 항목을 말하며 해당 정보는 T ID 제공을 위해 회원의 동의 하에 개별 서비스에서 공유합니다. 회사는 회원이 T ID로 이용하고자 하는 개별 서비스의 유형에 따라 전문기관을 통한 실명 확인 및 본인인증을 요청할 수 있습니다.
-                  </li>
-                  <li style={s.listItem}>
-                    운영자 : T ID의 전반적인 관리와 원활한 운영을 위하여 회사가 선정한 자를 말합니다.
-                  </li>
-                </ol>
-              </div>
-            </div>
+            <section className="flex flex-col gap-4">
+              <span className="text-[20px] font-normal leading-8 text-black">제2조 (서비스 이용)</span>
+              <p className="m-0 text-base font-normal leading-6 text-[#3f3f46]">
+                이용자는 회사가 제공하는 절차와 정책에 따라 서비스를 이용할 수 있으며, 계정 정보는 본인 책임 하에 안전하게 관리해야 합니다.
+              </p>
+              <ol className="m-0 list-decimal pl-6 text-base font-normal leading-6 text-[#3f3f46]">
+                <li>이용을 위해 입력하는 정보는 정확하고 최신 상태여야 합니다.</li>
+                <li>타인의 계정을 무단으로 사용하거나 공유해서는 안 됩니다.</li>
+                <li>회사는 서비스 품질 향상을 위해 기능을 추가하거나 변경할 수 있습니다.</li>
+              </ol>
+            </section>
+
+            <section className="flex flex-col gap-4">
+              <span className="text-[20px] font-normal leading-8 text-black">제3조 (이용 제한)</span>
+              <p className="m-0 text-base font-normal leading-6 text-[#3f3f46]">
+                이용자는 관계 법령과 본 약관을 준수해야 하며, 서비스 운영을 방해하거나 타인의 권리를 침해하는 행위를 해서는 안 됩니다.
+              </p>
+            </section>
+
+            <section className="flex flex-col gap-4">
+              <span className="text-[20px] font-normal leading-8 text-black">제4조 (책임 제한)</span>
+              <p className="m-0 text-base font-normal leading-6 text-[#3f3f46]">
+                회사는 천재지변, 시스템 장애, 통신 장애 등 불가항력으로 인해 발생한 손해에 대해 관련 법령이 허용하는 범위에서 책임을 제한할 수 있습니다.
+              </p>
+            </section>
           </div>
         </div>
 
-        <div style={s.footer}>
+        <div className="flex items-center justify-between px-8 pb-8 pt-4">
           <div>
-            <Button
-              size="l"
-              variant="outlined"
-              color="info"
-              onClick={onClose}
-            >
+            <Button size="l" variant="outlined" color="info" onClick={onClose}>
               닫기
             </Button>
           </div>

@@ -1,4 +1,3 @@
-import type { CSSProperties } from "react";
 import { MdiTab } from "./MdiTab";
 import { TopUtil } from "./TopUtil";
 import { Breadcrumb } from "./Breadcrumb";
@@ -6,40 +5,6 @@ import { PageTitle } from "./PageTitle";
 import { usePageHeaderStore } from "@/shared/model/pageHeader.store";
 import { useMyInfoStore } from "@/shared/model/myInfo.store";
 import { useMyNotificationStore } from "@/shared/model/myNotification.store";
-
-const siteHeaderStyle: CSSProperties = {
-  width: "100%",
-  fontFamily: "'Pretendard', sans-serif",
-  flexShrink: 0,
-  zIndex: 10,
-  borderBottom: "1px solid #e4e4e7",
-};
-
-const topBarStyle: CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  width: "100%",
-  background: "#fafafa",
-  borderBottom: "1px solid #e4e4e7",
-  boxSizing: "border-box",
-};
-
-const pageTitleWrapStyle: CSSProperties = {
-  width: "100%",
-  background: "#ffffff",
-  display: "flex",
-  alignItems: "flex-start",
-  boxSizing: "border-box",
-};
-
-const pageTitleInnerStyle: CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  gap: 16,
-  width: "100%",
-  padding: "24px 32px",
-  boxSizing: "border-box",
-};
 
 export function PageHeader() {
   const breadcrumbItems = usePageHeaderStore((s) => s.breadcrumbItems);
@@ -71,8 +36,8 @@ export function PageHeader() {
   };
 
   return (
-    <div style={siteHeaderStyle}>
-      <div style={topBarStyle}>
+    <div className="z-10 w-full shrink-0 border-b border-[#e4e4e7] font-sans">
+      <div className="flex w-full items-center border-b border-[#e4e4e7] bg-[#fafafa] box-border">
         <MdiTab />
         <TopUtil
           bellNotification
@@ -82,8 +47,8 @@ export function PageHeader() {
         />
       </div>
       {title && (
-        <div style={pageTitleWrapStyle}>
-          <div style={pageTitleInnerStyle}>
+        <div className="flex w-full items-start bg-white box-border">
+          <div className="flex w-full flex-col gap-4 px-8 py-6 box-border">
             {breadcrumbItems.length > 0 && <Breadcrumb items={breadcrumbItems} />}
             <PageTitle
               title={title}

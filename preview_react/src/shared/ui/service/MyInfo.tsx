@@ -1,6 +1,4 @@
-import { useState } from "react";
-import type { CSSProperties } from "react";
-import { FONT } from "@/shared/ui/styles";
+﻿import { useState } from "react";
 import { SelectBox } from "@/shared/ui/global/SelectBox";
 import { Button } from "@/shared/ui/global/Button";
 
@@ -17,7 +15,7 @@ interface RoleGroup {
   id: string;
   level: "L3" | "L4";
   name: string;
-  status?: "신청" | "승인";
+  status?: "요청" | "승인";
   appliedAt?: string;
   approvedAt?: string;
 }
@@ -33,260 +31,6 @@ interface MyInfoProps {
   onLanguageSave?: () => void;
   onRoleGroupRequest?: () => void;
 }
-
-const s = {
-  wrapper: {
-    width: 340,
-    minWidth: 340,
-    height: "100%",
-    flexShrink: 0,
-    fontFamily: FONT,
-    display: "flex",
-    flexDirection: "column",
-    borderLeft: "1px solid #e4e4e7",
-    background: "#98a2b3",
-    boxSizing: "border-box",
-    overflow: "hidden",
-  } satisfies CSSProperties,
-  container: {
-    display: "flex",
-    flexDirection: "column",
-    width: "100%",
-    height: "100%",
-    boxSizing: "border-box",
-    padding: "24px 24px 32px 24px",
-    overflowY: "auto",
-  } satisfies CSSProperties,
-  col: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 16,
-    width: "100%",
-  } satisfies CSSProperties,
-  header: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    width: "100%",
-  } satisfies CSSProperties,
-  titleRow: {
-    display: "flex",
-    alignItems: "center",
-    gap: 4,
-  } satisfies CSSProperties,
-  titleText: {
-    fontFamily: FONT,
-    fontSize: 16,
-    fontWeight: 600,
-    lineHeight: "28px",
-    color: "#ffffff",
-    whiteSpace: "nowrap",
-  } satisfies CSSProperties,
-  closeBtn: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    width: 18,
-    height: 18,
-    background: "none",
-    border: "none",
-    cursor: "pointer",
-    padding: 0,
-    flexShrink: 0,
-  } satisfies CSSProperties,
-  section: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 32,
-    width: "100%",
-  } satisfies CSSProperties,
-  article: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 8,
-    width: "100%",
-  } satisfies CSSProperties,
-  articleHeader: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    width: "100%",
-  } satisfies CSSProperties,
-  articleTitle: {
-    fontFamily: FONT,
-    fontSize: 14,
-    fontWeight: 500,
-    lineHeight: "20px",
-    color: "#ffffff",
-    whiteSpace: "nowrap",
-  } satisfies CSSProperties,
-  card: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 8,
-    background: "#ffffff",
-    borderRadius: 8,
-    padding: "12px 16px",
-    width: "100%",
-    boxSizing: "border-box",
-  } satisfies CSSProperties,
-  labelControl: {
-    display: "flex",
-    gap: 4,
-    alignItems: "flex-start",
-  } satisfies CSSProperties,
-  label: {
-    display: "flex",
-    alignItems: "center",
-    height: 20,
-    fontFamily: FONT,
-    fontSize: 10,
-    fontWeight: 400,
-    lineHeight: "16px",
-    color: "#a1a1aa",
-    whiteSpace: "nowrap",
-    flexShrink: 0,
-  } satisfies CSSProperties,
-  value: {
-    fontFamily: FONT,
-    fontSize: 14,
-    fontWeight: 400,
-    lineHeight: "20px",
-    color: "#3f3f46",
-    whiteSpace: "nowrap",
-  } satisfies CSSProperties,
-  roleHeaderRow: {
-    display: "flex",
-    alignItems: "center",
-    gap: 10,
-    width: "100%",
-  } satisfies CSSProperties,
-  roleHeaderTitle: {
-    flex: "1 0 0",
-    fontFamily: FONT,
-    fontSize: 14,
-    fontWeight: 500,
-    lineHeight: "20px",
-    color: "#ffffff",
-  } satisfies CSSProperties,
-  roleCard: {
-    display: "flex",
-    flexDirection: "column",
-    background: "#ffffff",
-    borderRadius: 8,
-    padding: "12px 16px",
-    width: "100%",
-    boxSizing: "border-box",
-  } satisfies CSSProperties,
-  roleRow: {
-    display: "flex",
-    gap: 8,
-    alignItems: "flex-start",
-    width: "100%",
-  } satisfies CSSProperties,
-  roleIcon: {
-    width: 20,
-    height: 20,
-    borderRadius: "50%",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    flexShrink: 0,
-    fontSize: 9,
-    fontWeight: 700,
-    color: "#ffffff",
-  } satisfies CSSProperties,
-  roleName: {
-    flex: "1 0 0",
-    fontFamily: FONT,
-    fontSize: 14,
-    fontWeight: 400,
-    lineHeight: "20px",
-    color: "#3f3f46",
-  } satisfies CSSProperties,
-  badgeBase: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: "4px 10px",
-    borderRadius: 12,
-    fontSize: 12,
-    fontWeight: 500,
-    fontFamily: FONT,
-    lineHeight: "12px",
-    flexShrink: 0,
-  } satisfies CSSProperties,
-  badgeApproved: {
-    background: "#f2fdf5",
-    border: "1px solid #1ac057",
-    color: "#1ac057",
-  } satisfies CSSProperties,
-  badgePending: {
-    background: "#fafafa",
-    border: "1px solid #a1a1aa",
-    color: "#a1a1aa",
-  } satisfies CSSProperties,
-  tooltip: {
-    position: "absolute",
-    top: "50%",
-    right: "calc(100% + 4px)",
-    transform: "translateY(-50%)",
-    display: "flex",
-    alignItems: "center",
-    zIndex: 10,
-  } satisfies CSSProperties,
-  tooltipBox: {
-    background: "#52525b",
-    borderRadius: 8,
-    padding: "4px 8px",
-    maxWidth: 216,
-    whiteSpace: "nowrap",
-  } satisfies CSSProperties,
-  tooltipText: {
-    fontFamily: FONT,
-    fontSize: 12,
-    fontWeight: 400,
-    lineHeight: "18px",
-    color: "#ffffff",
-  } satisfies CSSProperties,
-  tooltipArrow: {
-    width: 0,
-    height: 0,
-    borderTop: "5px solid transparent",
-    borderBottom: "5px solid transparent",
-    borderLeft: "6px solid #52525b",
-    flexShrink: 0,
-  } satisfies CSSProperties,
-  accessCard: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 0,
-    background: "#ffffff",
-    borderRadius: 8,
-    padding: "12px 16px",
-    width: "100%",
-    boxSizing: "border-box",
-  } satisfies CSSProperties,
-  langSection: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 8,
-    background: "#667085",
-    borderRadius: 4,
-    padding: 8,
-    width: "100%",
-    boxSizing: "border-box",
-    alignItems: "flex-end",
-  } satisfies CSSProperties,
-  langFieldWrap: {
-    width: "100%",
-  } satisfies CSSProperties,
-  saveBtnWrap: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  } satisfies CSSProperties,
-};
 
 function TitleIcon() {
   return (
@@ -306,34 +50,32 @@ function CloseIcon() {
 }
 
 function RoleIconBadge({ level }: { level: "L3" | "L4" }) {
-  const bg = level === "L3" ? "#6366f1" : "#8b5cf6";
   return (
-    <div style={{ ...s.roleIcon, background: bg }}>
+    <div className={level === "L3" ? "flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#6366f1] text-[9px] font-bold text-white" : "flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#8b5cf6] text-[9px] font-bold text-white"}>
       {level}
     </div>
   );
 }
 
-function StatusBadge({ status, appliedAt, approvedAt }: { status: "신청" | "승인"; appliedAt?: string; approvedAt?: string }) {
+function StatusBadge({ status, appliedAt, approvedAt }: { status: "요청" | "승인"; appliedAt?: string; approvedAt?: string }) {
   const [hovered, setHovered] = useState(false);
-  const badgeStyle = status === "승인"
-    ? { ...s.badgeBase, ...s.badgeApproved }
-    : { ...s.badgeBase, ...s.badgePending };
 
   return (
     <div
-      style={{ position: "relative", display: "flex", alignItems: "flex-start", flexShrink: 0 }}
+      className="relative flex shrink-0 items-start"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <div style={badgeStyle}>{status}</div>
+      <div className={status === "승인" ? "flex shrink-0 items-center justify-center rounded-xl border border-[#1ac057] bg-[#f2fdf5] px-[10px] py-1 text-xs font-medium leading-3 text-[#1ac057]" : "flex shrink-0 items-center justify-center rounded-xl border border-[#a1a1aa] bg-[#fafafa] px-[10px] py-1 text-xs font-medium leading-3 text-[#a1a1aa]"}>
+        {status}
+      </div>
       {hovered && (appliedAt || approvedAt) && (
-        <div style={s.tooltip}>
-          <div style={s.tooltipBox}>
-            {appliedAt && <div style={s.tooltipText}>신청일시: {appliedAt}</div>}
-            {approvedAt && <div style={s.tooltipText}>승인일시: {approvedAt}</div>}
+        <div className="absolute right-[calc(100%+4px)] top-1/2 z-10 flex -translate-y-1/2 items-center">
+          <div className="max-w-[216px] whitespace-nowrap rounded-lg bg-[#52525b] px-2 py-1 text-xs font-normal leading-[18px] text-white">
+            {appliedAt && <div>요청일시: {appliedAt}</div>}
+            {approvedAt && <div>승인일시: {approvedAt}</div>}
           </div>
-          <div style={s.tooltipArrow} />
+          <div className="h-0 w-0 shrink-0 border-y-[5px] border-y-transparent border-l-[6px] border-l-[#52525b]" />
         </div>
       )}
     </div>
@@ -354,114 +96,85 @@ export function MyInfo({
   onClose,
   onLanguageChange,
   onLanguageSave,
-  onRoleGroupRequest,
 }: MyInfoProps) {
   if (!open) return null;
 
   return (
-    <div style={s.wrapper}>
-      <div style={s.container}>
-        <div style={s.col}>
-          <div style={s.header}>
-            <div style={s.titleRow}>
-              <TitleIcon />
-              <span style={s.titleText}>나의 정보</span>
+    <div className="flex h-full w-[340px] min-w-[340px] shrink-0 flex-col overflow-hidden border-l border-[#e4e4e7] bg-[#98a2b3] font-sans box-border">
+      <div className="flex h-full w-full flex-col gap-4 overflow-y-auto px-6 pb-8 pt-6 box-border">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1">
+            <TitleIcon />
+            <span className="whitespace-nowrap text-base font-semibold leading-7 text-white">나의 정보</span>
+          </div>
+          <button className="flex h-[18px] w-[18px] shrink-0 items-center justify-center border-none bg-none p-0" onClick={onClose} aria-label="닫기">
+            <CloseIcon />
+          </button>
+        </div>
+
+        <div className="flex w-full flex-col gap-8">
+          <div className="flex w-full flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <span className="whitespace-nowrap text-sm font-medium leading-5 text-white">개인 정보</span>
             </div>
-            <button style={s.closeBtn} onClick={onClose}>
-              <CloseIcon />
-            </button>
+            <div className="flex w-full flex-col gap-2 rounded-lg bg-white px-4 py-3 box-border">
+              {[
+                ["사번", userInfo.employeeId],
+                ["이름", userInfo.name],
+                ["소속 그룹", userInfo.company],
+                ["소속 조직", userInfo.department],
+                ["이메일", userInfo.email],
+                ["휴대폰 번호", userInfo.phone],
+              ].map(([label, value]) => (
+                <div key={label} className="flex items-start gap-1">
+                  <span className="flex h-5 shrink-0 items-center whitespace-nowrap text-[10px] font-normal leading-4 text-[#a1a1aa]">{label}</span>
+                  <span className="whitespace-nowrap text-sm font-normal leading-5 text-[#3f3f46]">{value}</span>
+                </div>
+              ))}
+            </div>
           </div>
 
-          <div style={s.section}>
-            <div style={s.article}>
-              <div style={s.articleHeader}>
-                <span style={s.articleTitle}>개인 정보</span>
-              </div>
-              <div style={s.card}>
-                <div style={s.labelControl}>
-                  <span style={s.label}>사번</span>
-                  <span style={s.value}>{userInfo.employeeId}</span>
-                </div>
-                <div style={s.labelControl}>
-                  <span style={s.label}>이름</span>
-                  <span style={s.value}>{userInfo.name}</span>
-                </div>
-                <div style={s.labelControl}>
-                  <span style={s.label}>소속 그룹사</span>
-                  <span style={s.value}>{userInfo.company}</span>
-                </div>
-                <div style={s.labelControl}>
-                  <span style={s.label}>소속 조직</span>
-                  <span style={s.value}>{userInfo.department}</span>
-                </div>
-                <div style={s.labelControl}>
-                  <span style={s.label}>이메일</span>
-                  <span style={s.value}>{userInfo.email}</span>
-                </div>
-                <div style={s.labelControl}>
-                  <span style={s.label}>핸드폰 번호</span>
-                  <span style={s.value}>{userInfo.phone}</span>
-                </div>
-              </div>
+          <div className="flex w-full flex-col gap-2">
+            <div className="flex items-center gap-2.5">
+              <span className="flex-1 text-sm font-medium leading-5 text-white">역할그룹</span>
             </div>
-
-            <div style={s.article}>
-              <div style={s.roleHeaderRow}>
-                <span style={s.roleHeaderTitle}>역할그룹</span>
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8, width: "100%" }}>
-                {roleGroups.map((role) => (
-                  <div key={role.id} style={s.roleCard}>
-                    <div style={s.roleRow}>
-                      <RoleIconBadge level={role.level} />
-                      <span style={s.roleName}>{role.name}</span>
-                      {role.status && (
-                        <StatusBadge
-                          status={role.status}
-                          appliedAt={role.appliedAt}
-                          approvedAt={role.approvedAt}
-                        />
-                      )}
-                    </div>
+            <div className="flex w-full flex-col gap-2">
+              {roleGroups.map((role) => (
+                <div key={role.id} className="flex w-full flex-col rounded-lg bg-white px-4 py-3 box-border">
+                  <div className="flex w-full items-start gap-2">
+                    <RoleIconBadge level={role.level} />
+                    <span className="flex-1 text-sm font-normal leading-5 text-[#3f3f46]">{role.name}</span>
+                    {role.status && <StatusBadge status={role.status} appliedAt={role.appliedAt} approvedAt={role.approvedAt} />}
                   </div>
-                ))}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex w-full flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <span className="whitespace-nowrap text-sm font-medium leading-5 text-white">접속 정보</span>
+            </div>
+            <div className="flex w-full flex-col rounded-lg bg-white px-4 py-3 box-border">
+              <div className="flex items-start gap-1">
+                <span className="flex h-5 shrink-0 items-center whitespace-nowrap text-[10px] font-normal leading-4 text-[#a1a1aa]">마지막 로그인</span>
+                <span className="whitespace-nowrap text-sm font-normal leading-5 text-[#3f3f46]">{lastLogin ?? "-"}</span>
               </div>
             </div>
+          </div>
 
-            <div style={s.article}>
-              <div style={s.articleHeader}>
-                <span style={s.articleTitle}>접속 정보</span>
-              </div>
-              <div style={s.accessCard}>
-                <div style={s.labelControl}>
-                  <span style={s.label}>마지막 로그인</span>
-                  <span style={s.value}>{lastLogin ?? "-"}</span>
-                </div>
-              </div>
+          <div className="flex w-full flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <span className="whitespace-nowrap text-sm font-medium leading-5 text-white">언어 선택</span>
             </div>
-
-            <div style={s.article}>
-              <div style={s.articleHeader}>
-                <span style={s.articleTitle}>언어 선택</span>
+            <div className="flex w-full flex-col items-end gap-2 rounded bg-[#667085] p-2 box-border">
+              <div className="w-full">
+                <SelectBox options={LANGUAGE_OPTIONS} value={language} onChange={(val) => onLanguageChange?.(val)} />
               </div>
-              <div style={s.langSection}>
-                <div style={s.langFieldWrap}>
-                  <SelectBox
-                    options={LANGUAGE_OPTIONS}
-                    value={language}
-                    onChange={(val) => onLanguageChange?.(val)}
-                  />
-                </div>
-                <div style={s.saveBtnWrap}>
-                  <Button
-                    variant="outlined"
-                    size="m"
-                    onClick={() => onLanguageSave?.()}
-                    style={{ borderColor: "#ffffff", color: "#ffffff" }}
-                  >
-                    저장
-                  </Button>
-                </div>
+              <div className="flex items-center justify-center">
+                <Button variant="outlined" size="m" onClick={() => onLanguageSave?.()} style={{ borderColor: "#ffffff", color: "#ffffff" }}>
+                  저장
+                </Button>
               </div>
             </div>
           </div>

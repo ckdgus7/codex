@@ -1,5 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
-import type { CSSProperties } from "react";
+﻿import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router";
 import { useFavoritesStore } from "@/shared/model/favorites.store";
 import { useMenuStore } from "@/shared/model/menu.store";
@@ -7,298 +6,57 @@ import type { LnbItem } from "@/shared/model/menu.store";
 
 const SIDEBAR_WIDTH = 240;
 const SIDEBAR_COLLAPSED_WIDTH = 44;
-
-const s = {
-  sidebar: {
-    width: SIDEBAR_WIDTH,
-    minWidth: SIDEBAR_WIDTH,
-    height: "100%",
-    background: "#fff",
-    borderRight: "1px solid #e4e4e7",
-    display: "flex",
-    flexDirection: "column",
-    boxSizing: "border-box",
-    fontFamily: "'Pretendard', sans-serif",
-    position: "relative",
-    transition: "width 0.2s ease, min-width 0.2s ease",
-  } satisfies CSSProperties,
-  sidebarCollapsed: {
-    width: SIDEBAR_COLLAPSED_WIDTH,
-    minWidth: SIDEBAR_COLLAPSED_WIDTH,
-    height: "100%",
-    background: "#fff",
-    borderRight: "1px solid #e4e4e7",
-    display: "flex",
-    flexDirection: "column",
-    boxSizing: "border-box",
-    fontFamily: "'Pretendard', sans-serif",
-    position: "relative",
-    transition: "width 0.2s ease, min-width 0.2s ease",
-    overflow: "hidden",
-  } satisfies CSSProperties,
-  logoWrap: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 16,
-    flexShrink: 0,
-  } satisfies CSSProperties,
-  logoInner: {
-    display: "flex",
-    alignItems: "flex-start",
-    gap: 8,
-  } satisfies CSSProperties,
-  logoIcon: {
-    width: 24,
-    height: 24,
-    borderRadius: 4,
-    background: "#18181b",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    flexShrink: 0,
-  } satisfies CSSProperties,
-  logoIconText: {
-    color: "#fff",
-    fontSize: 11,
-    fontWeight: 700,
-    lineHeight: 1,
-  } satisfies CSSProperties,
-  logoTitle: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 4,
-    width: 164,
-    color: "#71717a",
-  } satisfies CSSProperties,
-  logoNova: {
-    fontSize: 16,
-    fontWeight: 600,
-    lineHeight: "20px",
-  } satisfies CSSProperties,
-  logoDevops: {
-    fontSize: 28,
-    fontWeight: 900,
-    lineHeight: "32px",
-  } satisfies CSSProperties,
-  navWrap: {
-    flex: 1,
-    overflowY: "auto",
-    overflowX: "hidden",
-    display: "flex",
-    flexDirection: "column",
-  } satisfies CSSProperties,
-  depthWrap: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 2,
-    padding: "8px 2px",
-    borderTop: "1px solid #e4e4e7",
-  } satisfies CSSProperties,
-  depthRow1: {
-    display: "flex",
-    alignItems: "center",
-    gap: 8,
-    padding: "12px 8px",
-    cursor: "pointer",
-    userSelect: "none",
-  } satisfies CSSProperties,
-  depthIcon1: {
-    width: 24,
-    height: 24,
-    opacity: 0.5,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    flexShrink: 0,
-    fontSize: 16,
-  } satisfies CSSProperties,
-  depthTitle1: {
-    flex: 1,
-    fontSize: 14,
-    fontWeight: 400,
-    color: "#3f3f46",
-    lineHeight: "20px",
-    whiteSpace: "nowrap",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-  } satisfies CSSProperties,
-  depthTitle1Active: {
-    flex: 1,
-    fontSize: 14,
-    fontWeight: 700,
-    color: "#18181b",
-    lineHeight: "20px",
-    whiteSpace: "nowrap",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-  } satisfies CSSProperties,
-  depth2Wrap: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 1,
-  } satisfies CSSProperties,
-  depthRow2: {
-    display: "flex",
-    alignItems: "center",
-    gap: 6,
-    padding: "8px 8px 8px 14px",
-    cursor: "pointer",
-    borderRadius: 4,
-  } satisfies CSSProperties,
-  depthRow2Active: {
-    display: "flex",
-    alignItems: "center",
-    gap: 6,
-    padding: "8px 8px 8px 14px",
-    cursor: "pointer",
-    borderRadius: 4,
-    background: "#f4f4f5",
-  } satisfies CSSProperties,
-  depthIcon2: {
-    width: 20,
-    height: 20,
-    opacity: 0.5,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    flexShrink: 0,
-    fontSize: 13,
-  } satisfies CSSProperties,
-  depthTitle2: {
-    flex: 1,
-    fontSize: 12,
-    fontWeight: 400,
-    color: "#3f3f46",
-    lineHeight: "18px",
-    whiteSpace: "nowrap",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-  } satisfies CSSProperties,
-  depthTitle2Active: {
-    flex: 1,
-    fontSize: 12,
-    fontWeight: 600,
-    color: "#18181b",
-    lineHeight: "18px",
-    whiteSpace: "nowrap",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-  } satisfies CSSProperties,
-  favWrap: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 8,
-    padding: "24px 16px",
-    flexShrink: 0,
-    borderTop: "1px solid #e4e4e7",
-  } satisfies CSSProperties,
-  favHeader: {
-    display: "flex",
-    alignItems: "center",
-    gap: 4,
-  } satisfies CSSProperties,
-  favLabel: {
-    fontSize: 12,
-    fontWeight: 700,
-    color: "#3f3f46",
-    lineHeight: "18px",
-  } satisfies CSSProperties,
-  favEmpty: {
-    fontSize: 12,
-    fontWeight: 400,
-    color: "#71717a",
-    textAlign: "center",
-    padding: 16,
-    lineHeight: "18px",
-    background: "#fafafa",
-    borderRadius: 4,
-  } satisfies CSSProperties,
-  favItem: {
-    display: "inline-flex",
-    alignItems: "center",
-    gap: 4,
-    padding: "4px 10px",
-    fontSize: 12,
-    color: "#3f3f46",
-    background: "#f4f4f5",
-    borderRadius: 4,
-    marginRight: 4,
-    marginBottom: 4,
-    cursor: "pointer",
-  } satisfies CSSProperties,
-  favRemove: {
-    fontSize: 10,
-    color: "#a1a1aa",
-    cursor: "pointer",
-    lineHeight: 1,
-  } satisfies CSSProperties,
-  functionWrap: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "flex-end",
-    padding: 16,
-    flexShrink: 0,
-  } satisfies CSSProperties,
-  collapseBtn: {
-    width: 24,
-    height: 24,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    cursor: "pointer",
-    border: "none",
-    background: "transparent",
-    padding: 0,
-    borderRadius: 4,
-  } satisfies CSSProperties,
-};
+const cx = (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(" ");
 
 const GNB_ICONS: Record<string, string> = {
-  "요구관리": "📋",
-  "UI 관리": "🎨",
-  "기능관리": "⚙️",
-  "게시판": "📌",
-  "SSF관리": "🗂️",
-  "워크스페이스": "🏢",
-  "업무 기준 정보 관리": "📊",
+  "요구관리": "R",
+  "UI 관리": "U",
+  "기능관리": "F",
+  "게시판": "N",
+  "SSF관리": "S",
+  "SBF 관리": "B",
+  "워크스페이스": "W",
+  "업무 기준 정보 관리": "I",
 };
 
 const LNB_ICONS: Record<string, string> = {
-  "요구사항": "📄",
-  "요구사항 명세 작성": "📝",
-  "요구사항 검토자 배정": "👤",
-  "요구사항 검토": "🔍",
-  "요구상세": "📑",
-  "요구상세 승인": "✅",
-  "요구사항 반려 검토": "🔄",
-  "업무 Flow 설계": "🔀",
-  "애플리케이션 설계": "🏗️",
-  "SB기획": "📐",
-  "UI디자인": "🖌️",
-  "퍼블리싱": "🌐",
-  "기능설계": "📊",
-  "상세기능 설계": "📈",
-  "공지사항": "📢",
-  "Q&A": "❓",
-  "도메인(L1)정보 관리": "🌐",
-  "컴포넌트(L2)정보 관리": "🧩",
-  "업무(L3)정보 관리": "📋",
-  "기능(L4)정보 관리": "⚙️",
-  "SSF탐색기": "🔎",
-  "사용자 관리": "👥",
-  "사이트 이용약관 관리": "📜",
-  "개인정보 처리방침 관리": "🔒",
-  "업무Flow 관리": "🔀",
-  "화면 기준 정보 관리": "🖥️",
-  "개발 진척 관리": "📈",
-  "과제 관리": "📝",
+  "요구사항": "R",
+  "요구사항 명세 작성": "S",
+  "요구사항 검토자 배정": "A",
+  "요구사항 검토": "V",
+  "요구상세": "D",
+  "요구상세 승인": "P",
+  "요구사항 반려 검토": "X",
+  "업무 Flow 설계": "F",
+  "애플리케이션 설계": "A",
+  "SB기획": "S",
+  "UI디자인": "U",
+  "퍼블리싱": "P",
+  "기능설계": "F",
+  "상세기능 설계": "D",
+  "공지사항": "N",
+  "Q&A": "Q",
+  "도메인(L1)정보 관리": "D",
+  "컴포넌트(L2)정보 관리": "C",
+  "업무(L3)정보 관리": "B",
+  "기능(L4)정보 관리": "F",
+  "SSF탐색기": "S",
+  "Lifecycle(D1) 관리": "L",
+  "업무영역(D2) 관리": "A",
+  "업무Flow(D3) 관리": "F",
+  "SBF 탐색기": "S",
+  "사용자관리": "U",
+  "서비스 이용약관 관리": "T",
+  "개인정보 처리방침 관리": "P",
+  "업무Flow 관리": "F",
+  "화면 기준 정보 관리": "V",
+  "개발 진척 관리": "G",
+  "과제 관리": "P",
 };
 
 function HeartIcon() {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={{ opacity: 0.5, flexShrink: 0 }}>
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="shrink-0 opacity-50">
       <path
         d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
         stroke="#3f3f46"
@@ -375,34 +133,30 @@ export function LNB({ activeItem = "Q&A", activeGnb = "게시판", onItemClick }
 
   if (collapsed) {
     return (
-      <aside style={s.sidebarCollapsed}>
-        <div style={{ ...s.logoWrap, padding: "16px 10px" }}>
-          <div style={s.logoIcon}>
-            <span style={s.logoIconText}>N</span>
+      <aside style={{ width: SIDEBAR_COLLAPSED_WIDTH, minWidth: SIDEBAR_COLLAPSED_WIDTH }} className="relative flex h-full flex-col overflow-hidden border-r border-[#e4e4e7] bg-white font-sans box-border transition-[width,min-width] duration-200 ease-in-out">
+        <div className="flex shrink-0 flex-col items-center justify-center px-[10px] py-4">
+          <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded bg-[#18181b]">
+            <span className="text-[11px] font-bold leading-none text-white">N</span>
           </div>
         </div>
-        <div style={s.navWrap}>
+        <div className="flex flex-1 flex-col overflow-x-hidden overflow-y-auto">
           {menuItems.map((gnb) => (
-            <div key={gnb.id} style={{ ...s.depthWrap, padding: "8px 0" }}>
+            <div key={gnb.id} className="flex flex-col gap-0.5 border-t border-[#e4e4e7] px-0 py-2">
               <div
-                style={{ ...s.depthRow1, justifyContent: "center", padding: "12px 0" }}
+                className="flex cursor-pointer select-none items-center justify-center px-0 py-3"
                 onClick={() => {
                   setCollapsed(false);
                   setExpandedSections((prev) => ({ ...prev, [gnb.gnbName]: true }));
                 }}
                 title={gnb.gnbName}
               >
-                <span style={s.depthIcon1}>{GNB_ICONS[gnb.gnbName] || "📁"}</span>
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center text-base font-semibold opacity-50">{GNB_ICONS[gnb.gnbName] || "M"}</span>
               </div>
             </div>
           ))}
         </div>
-        <div style={{ ...s.functionWrap, justifyContent: "center" }}>
-          <button
-            style={s.collapseBtn}
-            onClick={() => setCollapsed(false)}
-            title="사이드바 펼치기"
-          >
+        <div className="flex shrink-0 items-center justify-center p-4">
+          <button className="flex h-6 w-6 items-center justify-center rounded border-none bg-transparent p-0" onClick={() => setCollapsed(false)} title="사이드바 펼치기">
             <CollapseSidebarIcon direction="right" />
           </button>
         </div>
@@ -411,46 +165,37 @@ export function LNB({ activeItem = "Q&A", activeGnb = "게시판", onItemClick }
   }
 
   return (
-    <aside style={s.sidebar}>
-      <div style={s.logoWrap}>
-        <div style={s.logoInner}>
-          <div style={s.logoIcon}>
-            <span style={s.logoIconText}>N</span>
+    <aside style={{ width: SIDEBAR_WIDTH, minWidth: SIDEBAR_WIDTH }} className="relative flex h-full flex-col border-r border-[#e4e4e7] bg-white font-sans box-border transition-[width,min-width] duration-200 ease-in-out">
+      <div className="flex shrink-0 flex-col items-center justify-center p-4">
+        <div className="flex items-start gap-2">
+          <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded bg-[#18181b]">
+            <span className="text-[11px] font-bold leading-none text-white">N</span>
           </div>
-          <div style={s.logoTitle}>
-            <span style={s.logoNova}>NOVA</span>
-            <span style={s.logoDevops}>AI DevOps</span>
+          <div className="flex w-[164px] flex-col gap-1 text-[#71717a]">
+            <span className="text-base font-semibold leading-5">NOVA</span>
+            <span className="text-[28px] font-black leading-8">AI DevOps</span>
           </div>
         </div>
       </div>
 
-      <div style={s.navWrap}>
+      <div className="flex flex-1 flex-col overflow-x-hidden overflow-y-auto">
         {menuItems.map((gnb) => {
           const isExpanded = !!expandedSections[gnb.gnbName];
           const isGnbActive = gnb.gnbName === activeGnb;
           return (
-            <div key={gnb.id} style={s.depthWrap}>
-              <div
-                style={s.depthRow1}
-                onClick={() => toggleSection(gnb.gnbName)}
-              >
-                <span style={s.depthIcon1}>{GNB_ICONS[gnb.gnbName] || "📁"}</span>
-                <span style={isGnbActive ? s.depthTitle1Active : s.depthTitle1}>{gnb.gnbName}</span>
+            <div key={gnb.id} className="flex flex-col gap-0.5 border-t border-[#e4e4e7] px-0.5 py-2">
+              <div className="flex cursor-pointer select-none items-center gap-2 px-2 py-3" onClick={() => toggleSection(gnb.gnbName)}>
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center text-base font-semibold opacity-50">{GNB_ICONS[gnb.gnbName] || "M"}</span>
+                <span className={cx("flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-sm leading-5", isGnbActive ? "font-bold text-[#18181b]" : "font-normal text-[#3f3f46]")}>{gnb.gnbName}</span>
               </div>
               {isExpanded && (
-                <div style={s.depth2Wrap}>
+                <div className="flex flex-col gap-px">
                   {gnb.lnb.map((item) => {
                     const isActive = item.name === activeItem;
                     return (
-                      <div
-                        key={item.path}
-                        style={isActive ? s.depthRow2Active : s.depthRow2}
-                        onClick={() => handleItemClick(item)}
-                      >
-                        <span style={s.depthIcon2}>{LNB_ICONS[item.name] || "•"}</span>
-                        <span style={isActive ? s.depthTitle2Active : s.depthTitle2}>
-                          {item.name}
-                        </span>
+                      <div key={item.path} className={cx("flex cursor-pointer items-center gap-1.5 rounded px-2 py-2 pl-[14px]", isActive && "bg-[#f4f4f5]")} onClick={() => handleItemClick(item)}>
+                        <span className="flex h-5 w-5 shrink-0 items-center justify-center text-[13px] font-semibold opacity-50">{LNB_ICONS[item.name] || "-"}</span>
+                        <span className={cx("flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-xs leading-[18px]", isActive ? "font-semibold text-[#18181b]" : "font-normal text-[#3f3f46]")}>{item.name}</span>
                       </div>
                     );
                   })}
@@ -461,32 +206,28 @@ export function LNB({ activeItem = "Q&A", activeGnb = "게시판", onItemClick }
         })}
       </div>
 
-      <div style={s.favWrap}>
-        <div style={s.favHeader}>
+      <div className="flex shrink-0 flex-col gap-2 border-t border-[#e4e4e7] px-4 py-6">
+        <div className="flex items-center gap-1">
           <HeartIcon />
-          <span style={s.favLabel}>즐겨찾기</span>
+          <span className="text-xs font-bold leading-[18px] text-[#3f3f46]">즐겨찾기</span>
         </div>
         {favorites.length === 0 ? (
-          <div style={s.favEmpty}>
-            즐겨찾기에<br />등록한 화면이 없습니다.
+          <div className="rounded bg-[#fafafa] p-4 text-center text-xs font-normal leading-[18px] text-[#71717a]">
+            즐겨찾기에<br />등록된 화면이 없습니다.
           </div>
         ) : (
-          <div style={{ display: "flex", flexWrap: "wrap" }}>
+          <div className="flex flex-wrap">
             {favorites.map((item) => (
-              <div
-                key={item}
-                style={s.favItem}
-                onClick={() => handleFavoriteClick(item)}
-              >
+              <div key={item} className="mb-1 mr-1 inline-flex cursor-pointer items-center gap-1 rounded bg-[#f4f4f5] px-2.5 py-1 text-xs text-[#3f3f46]" onClick={() => handleFavoriteClick(item)}>
                 <span>{item}</span>
                 <span
-                  style={s.favRemove}
+                  className="cursor-pointer text-[10px] leading-none text-[#a1a1aa]"
                   onClick={(e) => {
                     e.stopPropagation();
                     removeFavorite(item);
                   }}
                 >
-                  ✕
+                  ×
                 </span>
               </div>
             ))}
@@ -494,12 +235,8 @@ export function LNB({ activeItem = "Q&A", activeGnb = "게시판", onItemClick }
         )}
       </div>
 
-      <div style={s.functionWrap}>
-        <button
-          style={s.collapseBtn}
-          onClick={() => setCollapsed(true)}
-          title="사이드바 접기"
-        >
+      <div className="flex shrink-0 items-center justify-end p-4">
+        <button className="flex h-6 w-6 items-center justify-center rounded border-none bg-transparent p-0" onClick={() => setCollapsed(true)} title="사이드바 접기">
           <CollapseSidebarIcon direction="left" />
         </button>
       </div>

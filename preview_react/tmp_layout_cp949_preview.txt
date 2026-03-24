@@ -1,0 +1,101 @@
+﻿import { Outlet, useLocation } from "react-router";
+import { useEffect, useState } from "react";
+import { LNB } from "./service/LNB";
+import { PageHeader } from "./service/PageHeader";
+import { PageFooter } from "./service/PageFooter";
+import { MyInfo } from "./service/MyInfo";
+import { MyNotification } from "./service/MyNotification";
+import { useMenuStore } from "@/shared/model/menu.store";
+import { useMyInfoStore } from "@/shared/model/myInfo.store";
+import { useMyNotificationStore } from "@/shared/model/myNotification.store";
+
+const MOCK_USER_INFO = {
+  employeeId: "P12345678",
+  name: "��??��",
+  company: "SK??��??",
+  department: "BSS Architect??",
+  email: "skkim@sktelecom.com",
+  phone: "010-1234-5678",
+};
+
+const MOCK_ROLE_GROUPS = [
+  { id: "1", level: "L3" as const, name: "L3 ��ȹ ����", status: "??û" as const, appliedAt: "2025-12-19 10:45" },
+  { id: "2", level: "L3" as const, name: "L3 Application ??�� ����" },
+  { id: "3", level: "L4" as const, name: "L4 Application ??�� ����", status: "??��" as const, appliedAt: "2025-12-19 10:45", approvedAt: "2025-12-19 17:21" },
+];
+
+const MOCK_NOTIFICATIONS = [
+  { id: "1", content: "[{??��??��}] ??��??��????��??�������?? ??��??��??��?? ??�� ??��??�� Detail ��ũ??�湮??��????��??�������?? ??��??��??��.", linkText: "??��??�� Detail", time: "15????" },
+  { id: "2", content: "[{??��??��}] ??��??��????��????��??��??��?? ??�� ??��??�� ��??�� ���� ��ũ??�湮??��????��??�� ��??��(L2) ����????��??�ּ�??", linkText: "??��??�� ��??�� ���� Detail", time: "1??�� ??", highlighted: true },
+  { id: "3", content: "[{??��??��}] ??��??��????��??��??��?? ??�� ??��??�� ��??�� ���� ��ũ??�湮??��??����� ??��????��??��????��??�� ��??��(L2) ����??��??�� �ּ�??", linkText: "??��??�� ��??�� ���� Detail", time: "3??�� ??" },
+  { id: "4", content: "[{??��??��}] ??��??��????��??��??��?? ??�� ??��??�� ��??�� ���� ��ũ??�湮??��??����� ??��????��??��????��??�� ??�� ???? ????�� ??��??��??�� �ּ�??", linkText: "??��??�� ��??Detail", time: "3??�� ??" },
+  { id: "5", content: "[{??��??��}] ??��??��??��??��??��??��??��??��. ??�� ��ũ??�湮??��????��??��??��??????�� ??�� ??��??��??��.", linkText: "??��??�� ��??Detail", time: "3??�� ??" },
+];
+
+export function LayoutRoute() {
+  const location = useLocation();
+  const menuItems = useMenuStore((s) => s.menuItems);
+  const fetchMenu = useMenuStore((s) => s.fetchMenu);
+  const [activeGnb, setActiveGnb] = useState("��ȹ");
+  const [activeLnb, setActiveLnb] = useState("??��??��");
+
+  const myInfoOpen = useMyInfoStore((s) => s.isOpen);
+  const closeMyInfo = useMyInfoStore((s) => s.close);
+  const [language, setLanguage] = useState("en");
+
+  const notifOpen = useMyNotificationStore((s) => s.isOpen);
+  const closeNotif = useMyNotificationStore((s) => s.close);
+
+  useEffect(() => {
+    fetchMenu();
+  }, [fetchMenu]);
+
+  useEffect(() => {
+    const path = location.pathname;
+    let bestMatch: { gnbName: string; lnbName: string; pathLen: number } | null = null;
+    for (const gnb of menuItems) {
+      for (const lnb of gnb.lnb) {
+        if (path === lnb.path || path.startsWith(lnb.path + "/")) {
+          if (!bestMatch || lnb.path.length > bestMatch.pathLen) {
+            bestMatch = { gnbName: gnb.gnbName, lnbName: lnb.name, pathLen: lnb.path.length };
+          }
+        }
+      }
+    }
+    if (bestMatch) {
+      setActiveGnb(bestMatch.gnbName);
+      setActiveLnb(bestMatch.lnbName);
+    }
+  }, [location.pathname, menuItems]);
+
+  return (
+    <div className="flex h-screen w-full font-sans">
+      <LNB activeItem={activeLnb} activeGnb={activeGnb} />
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden transition-[flex] duration-300 ease-in-out">
+        <PageHeader />
+        <div className="relative flex flex-1 flex-col overflow-auto bg-white">
+          <Outlet />
+        </div>
+        <PageFooter />
+      </div>
+      <MyInfo
+        open={myInfoOpen}
+        userInfo={MOCK_USER_INFO}
+        roleGroups={MOCK_ROLE_GROUPS}
+        lastLogin="2025-11-28 15:24"
+        language={language}
+        onClose={closeMyInfo}
+        onLanguageChange={setLanguage}
+      />
+      <MyNotification
+        open={notifOpen}
+        notifications={MOCK_NOTIFICATIONS}
+        totalCount={30}
+        loadedCount={10}
+        onClose={closeNotif}
+        onMore={() => {}}
+        onLinkClick={() => {}}
+      />
+    </div>
+  );
+}

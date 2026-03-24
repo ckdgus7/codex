@@ -378,9 +378,11 @@ export function QnAListView() {
                     </td>
                   </tr>
                 ) : (
-                  pageItems.map((item) => (
-                    <tr key={item.no} style={{ cursor: "pointer" }} onClick={() => navigate(`/qna/${item.no}`)}>
-                      <td style={listStyles.td}>{item.no}</td>
+                  pageItems.map((item, rowIdx) => {
+                    const rowNo = totalCount - (safePage - 1) * itemsPerPage - rowIdx;
+                    return (
+                    <tr key={item.id} style={{ cursor: "pointer" }} onClick={() => navigate(`/qna/${item.id}`)}>
+                      <td style={listStyles.td}>{rowNo}</td>
                       <td style={listStyles.td}>{item.category}</td>
                       <td style={{ ...listStyles.td, ...listStyles.tdLeft }}>
                         <div style={s.titleRow}>
@@ -396,7 +398,8 @@ export function QnAListView() {
                         </span>
                       </td>
                     </tr>
-                  ))
+                    );
+                  })
                 )}
               </tbody>
             </table>

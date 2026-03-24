@@ -1,4 +1,7 @@
-import { useState, type CSSProperties, type TextareaHTMLAttributes } from "react";
+import { useState, type CSSProperties, type TextareaHTMLAttributes, type ChangeEvent } from "react";
+
+const cx = (...classes: Array<string | false | null | undefined>) =>
+  classes.filter(Boolean).join(" ");
 
 interface TextareaProps extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "size" | "style"> {
   label?: string;
@@ -11,23 +14,6 @@ interface TextareaProps extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>
   style?: CSSProperties;
   wrapperStyle?: CSSProperties;
 }
-
-const FONT_FAMILY = "'Pretendard', sans-serif";
-
-const COLORS = {
-  label: "#a1a1aa",
-  requiredMark: "#36bffa",
-  borderDefault: "#e4e7ec",
-  borderFocus: "#7a5af8",
-  borderError: "#ee46bc",
-  background: "#ffffff",
-  backgroundReadonly: "#fafafa",
-  backgroundDisabled: "#f4f4f5",
-  placeholder: "#a1a1aa",
-  text: "#3f3f46",
-  indicator: "#a1a1aa",
-  errorText: "#ee46bc",
-};
 
 export function Textarea({
   label,
@@ -46,111 +32,12 @@ export function Textarea({
   ...rest
 }: TextareaProps) {
   const [focused, setFocused] = useState(false);
-  const [internalValue, setInternalValue] = useState(
-    (defaultValue as string) ?? ""
-  );
+  const [internalValue, setInternalValue] = useState((defaultValue as string) ?? "");
   const isControlled = value !== undefined;
-  const currentValue = isControlled ? (value as string) : internalValue;
+  const currentValue = isControlled ? String(value ?? "") : internalValue;
   const charCount = currentValue.length;
 
-  const getBorderColor = (): string => {
-    if (error) return COLORS.borderError;
-    if (focused && !disabled && !readOnly) return COLORS.borderFocus;
-    return COLORS.borderDefault;
-  };
-
-  const getBackgroundColor = (): string => {
-    if (disabled) return COLORS.backgroundDisabled;
-    if (readOnly) return COLORS.backgroundReadonly;
-    return COLORS.background;
-  };
-
-  const outerStyle: CSSProperties = {
-    display: "flex",
-    flexDirection: "column",
-    gap: 4,
-    ...wrapperStyle,
-  };
-
-  const labelRowStyle: CSSProperties = {
-    display: "flex",
-    alignItems: "center",
-    gap: 4,
-  };
-
-  const labelStyle: CSSProperties = {
-    fontFamily: FONT_FAMILY,
-    fontSize: 14,
-    fontWeight: 500,
-    lineHeight: "18px",
-    color: COLORS.label,
-  };
-
-  const requiredDotStyle: CSSProperties = {
-    width: 6,
-    height: 6,
-    borderRadius: "50%",
-    backgroundColor: COLORS.requiredMark,
-    flexShrink: 0,
-  };
-
-  const containerStyle: CSSProperties = {
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    minHeight: 120,
-    padding: 8,
-    borderRadius: 4,
-    border: `1px solid ${getBorderColor()}`,
-    backgroundColor: getBackgroundColor(),
-    boxSizing: "border-box",
-    ...style,
-  };
-
-  const textareaStyle: CSSProperties = {
-    width: "100%",
-    flex: 1,
-    border: "none",
-    outline: "none",
-    resize: "none",
-    padding: 0,
-    fontFamily: FONT_FAMILY,
-    fontSize: 16,
-    fontWeight: 400,
-    lineHeight: "24px",
-    color: COLORS.text,
-    backgroundColor: "transparent",
-    boxSizing: "border-box",
-  };
-
-  const indicatorRowStyle: CSSProperties = {
-    display: "flex",
-    justifyContent: "flex-end",
-    alignItems: "center",
-    width: "100%",
-    padding: 0,
-    boxSizing: "border-box",
-    flexShrink: 0,
-  };
-
-  const indicatorTextStyle: CSSProperties = {
-    fontFamily: FONT_FAMILY,
-    fontSize: 12,
-    fontWeight: 400,
-    lineHeight: "18px",
-    color: COLORS.indicator,
-  };
-
-  const helperTextStyle: CSSProperties = {
-    fontFamily: FONT_FAMILY,
-    fontSize: 12,
-    fontWeight: 400,
-    lineHeight: "18px",
-    color: error ? COLORS.errorText : COLORS.indicator,
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     if (!isControlled) {
       setInternalValue(e.target.value);
     }
@@ -158,14 +45,22 @@ export function Textarea({
   };
 
   return (
-    <div style={outerStyle}>
+    <div className="flex flex-col gap-1" style={wrapperStyle}>
       {(label || required) && (
-        <div style={labelRowStyle}>
-          {label && <span style={labelStyle}>{label}</span>}
-          {required && <span style={requiredDotStyle} />}
+        <div className="flex items-center gap-1">
+          {label && <span className="font-sans text-sm font-medium leading-[18px] text-[#a1a1aa]">{label}</span>}
+          {required && <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#36bffa]" />}
         </div>
       )}
-      <div style={containerStyle}>
+      <div
+        className={cx(
+          "flex min-h-[120px] flex-col items-start justify-between rounded border bg-white p-2 box-border",
+          error ? "border-[#ee46bc]" : focused && !disabled && !readOnly ? "border-[#7a5af8]" : "border-[#e4e7ec]",
+          readOnly && "bg-[#fafafa]",
+          disabled && "bg-[#f4f4f5]"
+        )}
+        style={style}
+      >
         <textarea
           {...rest}
           value={currentValue}
@@ -181,17 +76,21 @@ export function Textarea({
             setFocused(false);
             rest.onBlur?.(e);
           }}
-          style={textareaStyle}
+          className="min-h-[96px] w-full flex-1 resize-none border-none bg-transparent p-0 font-sans text-base font-normal leading-6 text-[#3f3f46] outline-none box-border placeholder:text-[#a1a1aa]"
         />
         {indicator && (
-          <div style={indicatorRowStyle}>
-            <span style={indicatorTextStyle}>
+          <div className="flex w-full shrink-0 items-center justify-end">
+            <span className="font-sans text-xs font-normal leading-[18px] text-[#a1a1aa]">
               {charCount}/{maxLength}
             </span>
           </div>
         )}
       </div>
-      {helperText && <span style={helperTextStyle}>{helperText}</span>}
+      {helperText && (
+        <span className={cx("font-sans text-xs font-normal leading-[18px]", error ? "text-[#ee46bc]" : "text-[#a1a1aa]")}>
+          {helperText}
+        </span>
+      )}
     </div>
   );
 }

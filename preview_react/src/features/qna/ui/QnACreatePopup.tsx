@@ -6,6 +6,7 @@ import { ToastEditor } from "@/shared/ui/service/ToastEditor";
 import { AlertModal } from "@/shared/ui/global/AlertModal";
 import { Snackbar } from "@/shared/ui/global/Snackbar";
 import { popupStyles as ps } from "@/shared/ui/styles";
+import { useQnAInsertMutation } from "@/features/qna/api/qna.queries";
 
 interface QnACreatePopupProps {
   open: boolean;
@@ -57,6 +58,7 @@ const CATEGORY_OPTIONS = [
 interface UploadedFile {
   id: string;
   name: string;
+  file: File;
 }
 
 export function QnACreatePopup({ open, onClose }: QnACreatePopupProps) {
@@ -69,11 +71,13 @@ export function QnACreatePopup({ open, onClose }: QnACreatePopupProps) {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dragCounterRef = useRef(0);
+  const insertMutation = useQnAInsertMutation();
 
   const addFiles = useCallback((fileList: FileList) => {
     const newFiles: UploadedFile[] = Array.from(fileList).map((f) => ({
       id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
       name: f.name,
+      file: f,
     }));
     setFiles((prev) => [...prev, ...newFiles]);
   }, []);
@@ -149,7 +153,14 @@ export function QnACreatePopup({ open, onClose }: QnACreatePopupProps) {
     onClose();
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    await insertMutation.mutateAsync({
+      category,
+      title,
+      author: "홍길동",
+      content,
+      attachments: files.map((f) => f.file),
+    });
     handleReset();
     setSnackbarOpen(true);
     onClose();
@@ -279,8 +290,9 @@ export function QnACreatePopup({ open, onClose }: QnACreatePopupProps) {
               variant="filled"
               color="positive"
               onClick={handleSave}
+              disabled={insertMutation.isPending}
             >
-              저장
+              {insertMutation.isPending ? "저장 중..." : "저장"}
             </Button>
           </div>
         </div>

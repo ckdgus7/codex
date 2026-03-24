@@ -1,4 +1,4 @@
-import { useEffect, useCallback, type CSSProperties, type ReactNode } from "react";
+﻿import { useEffect, useCallback, type CSSProperties, type ReactNode } from "react";
 
 type SnackbarType = "info" | "positive" | "negative" | "error" | "warning" | "success";
 
@@ -10,8 +10,6 @@ interface SnackbarProps {
   duration?: number;
   style?: CSSProperties;
 }
-
-const FONT_FAMILY = "'Pretendard', sans-serif";
 
 const BG_COLORS: Record<SnackbarType, string> = {
   info: "#71717a",
@@ -31,14 +29,7 @@ function CloseIcon() {
   );
 }
 
-export function Snackbar({
-  open,
-  onClose,
-  message,
-  type = "info",
-  duration = 3000,
-  style,
-}: SnackbarProps) {
+export function Snackbar({ open, onClose, message, type = "info", duration = 3000, style }: SnackbarProps) {
   const handleClose = useCallback(() => {
     onClose();
   }, [onClose]);
@@ -51,57 +42,10 @@ export function Snackbar({
 
   if (!open) return null;
 
-  const containerStyle: CSSProperties = {
-    position: "fixed",
-    bottom: 40,
-    left: "50%",
-    transform: "translateX(-50%)",
-    zIndex: 10000,
-    width: 480,
-    display: "flex",
-    gap: 16,
-    alignItems: "flex-start",
-    paddingLeft: 24,
-    paddingRight: 12,
-    paddingTop: 16,
-    paddingBottom: 16,
-    borderRadius: 8,
-    backgroundColor: BG_COLORS[type],
-    boxSizing: "border-box",
-    ...style,
-  };
-
-  const textStyle: CSSProperties = {
-    flex: "1 0 0",
-    fontFamily: FONT_FAMILY,
-    fontSize: 16,
-    fontWeight: 400,
-    lineHeight: "24px",
-    color: "#ffffff",
-    minHeight: 1,
-    minWidth: 1,
-  };
-
-  const closeButtonStyle: CSSProperties = {
-    display: "flex",
-    alignItems: "flex-start",
-    flexShrink: 0,
-    borderRadius: 36,
-    cursor: "pointer",
-    border: "none",
-    background: "none",
-    padding: 0,
-  };
-
   return (
-    <div style={containerStyle}>
-      <p style={textStyle}>{message}</p>
-      <button
-        type="button"
-        style={closeButtonStyle}
-        onClick={handleClose}
-        aria-label="닫기"
-      >
+    <div className="fixed bottom-10 left-1/2 z-[10000] flex w-[480px] -translate-x-1/2 items-start gap-4 rounded-lg px-6 pb-4 pt-4 box-border" style={{ backgroundColor: BG_COLORS[type], ...style }}>
+      <p className="min-h-px min-w-px flex-1 font-sans text-base font-normal leading-6 text-white">{message}</p>
+      <button type="button" className="flex shrink-0 items-start rounded-full border-none bg-none p-0" onClick={handleClose} aria-label="닫기">
         <CloseIcon />
       </button>
     </div>

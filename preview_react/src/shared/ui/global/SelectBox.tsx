@@ -1,4 +1,7 @@
-import { useState, useRef, useEffect, type CSSProperties } from "react";
+import { useState, useRef, useEffect, type CSSProperties, type MouseEvent as ReactMouseEvent } from "react";
+
+const cx = (...classes: Array<string | false | null | undefined>) =>
+  classes.filter(Boolean).join(" ");
 
 interface SelectOption {
   label: string;
@@ -38,33 +41,6 @@ interface MultiSelectBoxProps extends SelectBoxBaseProps {
 
 type SelectBoxProps = SingleSelectBoxProps | MultiSelectBoxProps;
 
-const FONT_FAMILY = "'Pretendard', sans-serif";
-
-const COLORS = {
-  label: "#a1a1aa",
-  labelText: "#52525b",
-  requiredMark: "#36bffa",
-  borderDefault: "#e4e7ec",
-  borderFocus: "#7a5af8",
-  borderError: "#f04438",
-  background: "#ffffff",
-  placeholder: "#a1a1aa",
-  text: "#18181b",
-  valueText: "#3f3f46",
-  iconColor: "#71717a",
-  errorText: "#f04438",
-  disabledBg: "#fafafa",
-  dropdownShadow: "0px 16px 32px rgba(23,37,76,0.12)",
-  hoverBg: "#f4f4f5",
-  activeBg: "#ede9fe",
-  chipBg: "#fafaff",
-  chipText: "#52525b",
-  checkedBg: "#7a5af8",
-  uncheckedBorder: "#e4e7ec",
-  searchBorder: "#e4e7ec",
-  highlightText: "#7a5af8",
-};
-
 function ChevronDownIcon({ rotated }: { rotated?: boolean }) {
   return (
     <svg
@@ -72,15 +48,11 @@ function ChevronDownIcon({ rotated }: { rotated?: boolean }) {
       height="24"
       viewBox="0 0 24 24"
       fill="none"
-      style={{
-        transition: "transform 0.15s ease",
-        transform: rotated ? "rotate(180deg)" : "rotate(0deg)",
-        flexShrink: 0,
-      }}
+      className={cx("shrink-0 transition-transform duration-150 ease-in-out", rotated && "rotate-180")}
     >
       <path
         d="M6 9L12 15L18 9"
-        stroke={COLORS.iconColor}
+        stroke="#71717a"
         strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -89,7 +61,7 @@ function ChevronDownIcon({ rotated }: { rotated?: boolean }) {
   );
 }
 
-function ClearIcon({ size = 24, color = COLORS.iconColor }: { size?: number; color?: string }) {
+function ClearIcon({ size = 24, color = "#71717a" }: { size?: number; color?: string }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <circle cx="12" cy="12" r="9" fill={color} opacity="0.15" />
@@ -102,8 +74,8 @@ function ClearIcon({ size = 24, color = COLORS.iconColor }: { size?: number; col
 function ChipCloseIcon() {
   return (
     <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-      <path d="M4 4L8 8" stroke={COLORS.chipText} strokeWidth="1" strokeLinecap="round" />
-      <path d="M8 4L4 8" stroke={COLORS.chipText} strokeWidth="1" strokeLinecap="round" />
+      <path d="M4 4L8 8" stroke="#52525b" strokeWidth="1" strokeLinecap="round" />
+      <path d="M8 4L4 8" stroke="#52525b" strokeWidth="1" strokeLinecap="round" />
     </svg>
   );
 }
@@ -113,33 +85,24 @@ function SearchIcon() {
     <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
       <path
         d="M8 14C11.3137 14 14 11.3137 14 8C14 4.68629 11.3137 2 8 2C4.68629 2 2 4.68629 2 8C2 11.3137 4.68629 14 8 14Z"
-        stroke={COLORS.iconColor}
+        stroke="#71717a"
         strokeWidth="1.2"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <path d="M16 16L12.1 12.1" stroke={COLORS.iconColor} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M16 16L12.1 12.1" stroke="#71717a" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
 
 function MiniCheckbox({ checked }: { checked: boolean }) {
-  const boxStyle: CSSProperties = {
-    width: 20,
-    height: 20,
-    borderRadius: 4,
-    flexShrink: 0,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    boxSizing: "border-box",
-    ...(checked
-      ? { backgroundColor: COLORS.checkedBg }
-      : { backgroundColor: COLORS.background, border: `1px solid ${COLORS.uncheckedBorder}` }),
-  };
-
   return (
-    <div style={boxStyle}>
+    <div
+      className={cx(
+        "flex h-5 w-5 shrink-0 items-center justify-center rounded box-border",
+        checked ? "bg-[#7a5af8]" : "border border-[#e4e7ec] bg-white"
+      )}
+    >
       {checked && (
         <svg width="12" height="9" viewBox="0 0 14 10" fill="none">
           <path d="M1 5L5 9L13 1" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -169,7 +132,7 @@ function HighlightedLabel({ label, searchText }: { label: string; searchText: st
   return (
     <span>
       {before}
-      <span style={{ fontWeight: 700, color: COLORS.highlightText }}>{match}</span>
+      <span className="font-bold text-[#7a5af8]">{match}</span>
       {after}
     </span>
   );
@@ -178,14 +141,14 @@ function HighlightedLabel({ label, searchText }: { label: string; searchText: st
 export function SelectBox(props: SelectBoxProps) {
   const {
     options,
-    placeholder = "선택",
+    placeholder = "Select",
     label,
     required = false,
     disabled = false,
     error = false,
     helperText,
     searchable = false,
-    searchPlaceholder = "검색",
+    searchPlaceholder = "Search",
     searchHighlight = true,
     style,
     wrapperStyle,
@@ -204,23 +167,25 @@ export function SelectBox(props: SelectBoxProps) {
 
   useEffect(() => {
     if (!open) return;
-    const handleOutside = (e: MouseEvent) => {
+
+    const handleOutside = (e: globalThis.MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setOpen(false);
         setSearchText("");
       }
     };
+
     document.addEventListener("mousedown", handleOutside);
     return () => document.removeEventListener("mousedown", handleOutside);
   }, [open]);
 
   useEffect(() => {
-    if (open && searchable) {
-      if (isMultiple && inlineSearchRef.current) {
-        inlineSearchRef.current.focus();
-      } else if (!isMultiple && searchInputRef.current) {
-        searchInputRef.current.focus();
-      }
+    if (!open || !searchable) return;
+
+    if (isMultiple) {
+      inlineSearchRef.current?.focus();
+    } else {
+      searchInputRef.current?.focus();
     }
   }, [open, searchable, isMultiple]);
 
@@ -234,71 +199,76 @@ export function SelectBox(props: SelectBoxProps) {
     ? options.filter((o) => o.label.toLowerCase().includes(searchText.toLowerCase()))
     : options;
 
-  const allFilteredSelected = isMultiple && filteredOptions.length > 0 &&
-    filteredOptions.every((o) => multiValue.includes(o.value));
+  const allFilteredSelected =
+    isMultiple && filteredOptions.length > 0 && filteredOptions.every((o) => multiValue.includes(o.value));
 
-  const borderColor = error
-    ? COLORS.borderError
-    : open
-      ? COLORS.borderFocus
-      : COLORS.borderDefault;
+  const hasChips = isMultiple && selectedOptions.length > 0;
+  const hasClearable = isMultiple ? multiValue.length > 0 : !!singleValue;
+  const shouldHighlight = searchable && searchHighlight && searchText.length > 0;
 
   const handleToggle = () => {
-    if (!disabled) {
-      setOpen((prev) => !prev);
-      if (open) setSearchText("");
-    }
-  };
-
-  const handleSingleSelect = (optionValue: string) => {
-    if (!isMultiple) {
-      (props as SingleSelectBoxProps).onChange(optionValue);
-      setOpen(false);
+    if (disabled) return;
+    setOpen((prev) => !prev);
+    if (open) {
       setSearchText("");
     }
   };
 
+  const handleSingleSelect = (optionValue: string) => {
+    if (isMultiple) return;
+    (props as SingleSelectBoxProps).onChange(optionValue);
+    setOpen(false);
+    setSearchText("");
+  };
+
   const handleMultiToggle = (optionValue: string) => {
-    if (isMultiple) {
-      const current = (props as MultiSelectBoxProps).value;
-      const onChange = (props as MultiSelectBoxProps).onChange;
-      if (current.includes(optionValue)) {
-        onChange(current.filter((v) => v !== optionValue));
-      } else {
-        if (maxSelections !== undefined && current.length >= maxSelections) return;
-        onChange([...current, optionValue]);
-      }
+    if (!isMultiple) return;
+
+    const current = (props as MultiSelectBoxProps).value;
+    const onChange = (props as MultiSelectBoxProps).onChange;
+
+    if (current.includes(optionValue)) {
+      onChange(current.filter((v) => v !== optionValue));
+      return;
     }
+
+    if (maxSelections !== undefined && current.length >= maxSelections) {
+      return;
+    }
+
+    onChange([...current, optionValue]);
   };
 
   const handleSelectAll = () => {
-    if (isMultiple) {
-      const onChange = (props as MultiSelectBoxProps).onChange;
-      if (allFilteredSelected) {
-        const filteredValues = filteredOptions.map((o) => o.value);
-        onChange(multiValue.filter((v) => !filteredValues.includes(v)));
-      } else {
-        const newValues = [...multiValue];
-        for (const o of filteredOptions) {
-          if (!newValues.includes(o.value)) {
-            if (maxSelections !== undefined && newValues.length >= maxSelections) break;
-            newValues.push(o.value);
-          }
+    if (!isMultiple) return;
+
+    const onChange = (props as MultiSelectBoxProps).onChange;
+
+    if (allFilteredSelected) {
+      const filteredValues = filteredOptions.map((o) => o.value);
+      onChange(multiValue.filter((v) => !filteredValues.includes(v)));
+      return;
+    }
+
+    const newValues = [...multiValue];
+    for (const option of filteredOptions) {
+      if (!newValues.includes(option.value)) {
+        if (maxSelections !== undefined && newValues.length >= maxSelections) {
+          break;
         }
-        onChange(newValues);
+        newValues.push(option.value);
       }
     }
+    onChange(newValues);
   };
 
   const handleChipRemove = (optionValue: string) => {
-    if (isMultiple) {
-      const current = (props as MultiSelectBoxProps).value;
-      const onChange = (props as MultiSelectBoxProps).onChange;
-      onChange(current.filter((v) => v !== optionValue));
-    }
+    if (!isMultiple) return;
+    const onChange = (props as MultiSelectBoxProps).onChange;
+    onChange(multiValue.filter((v) => v !== optionValue));
   };
 
-  const handleClearAll = (e: React.MouseEvent) => {
+  const handleClearAll = (e: ReactMouseEvent<HTMLElement>) => {
     e.stopPropagation();
     if (isMultiple) {
       (props as MultiSelectBoxProps).onChange([]);
@@ -308,250 +278,42 @@ export function SelectBox(props: SelectBoxProps) {
     setSearchText("");
   };
 
-  const wrapper: CSSProperties = {
-    display: "flex",
-    flexDirection: "column",
-    gap: 8,
-    alignItems: "flex-start",
-    width: "100%",
-    ...wrapperStyle,
-  };
-
-  const labelRow: CSSProperties = {
-    display: "flex",
-    alignItems: "center",
-  };
-
-  const labelContainer: CSSProperties = {
-    display: "flex",
-    gap: 4,
-    alignItems: "center",
-    justifyContent: "center",
-  };
-
-  const labelStyle: CSSProperties = {
-    fontFamily: FONT_FAMILY,
-    fontSize: 14,
-    fontWeight: 500,
-    lineHeight: "18px",
-    color: COLORS.labelText,
-    whiteSpace: "nowrap",
-  };
-
-  const requiredMark: CSSProperties = {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: COLORS.requiredMark,
-    flexShrink: 0,
-  };
-
-  const hasChips = isMultiple && selectedOptions.length > 0;
-  const hasClearable = isMultiple ? multiValue.length > 0 : !!singleValue;
-
-  const fieldBase: CSSProperties = {
-    display: "flex",
-    alignItems: "center",
-    gap: 8,
-    padding: 8,
-    minHeight: 40,
-    backgroundColor: disabled ? COLORS.disabledBg : COLORS.background,
-    border: `1px solid ${borderColor}`,
-    borderRadius: 4,
-    boxSizing: "border-box",
-    width: "100%",
-    opacity: disabled ? 0.6 : 1,
-    cursor: disabled ? "not-allowed" : "pointer",
-    transition: "border-color 0.15s ease",
-    position: "relative",
-    userSelect: "none",
-    flexWrap: hasChips ? "wrap" : undefined,
-    ...style,
-  };
-
-  const chipsWrap: CSSProperties = {
-    display: "flex",
-    flexWrap: "wrap",
-    gap: 4,
-    alignItems: "center",
-    flex: "1 0 0",
-    paddingLeft: 4,
-    minWidth: 0,
-  };
-
-  const chipStyle: CSSProperties = {
-    display: "flex",
-    gap: 4,
-    alignItems: "center",
-    justifyContent: "center",
-    maxWidth: 130,
-    paddingLeft: 6,
-    paddingRight: 6,
-    paddingTop: 3,
-    paddingBottom: 3,
-    borderRadius: 6,
-    backgroundColor: COLORS.chipBg,
-    flexShrink: 0,
-  };
-
-  const chipTextStyle: CSSProperties = {
-    fontFamily: FONT_FAMILY,
-    fontSize: 12,
-    fontWeight: 500,
-    lineHeight: "12px",
-    color: COLORS.chipText,
-    whiteSpace: "nowrap",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    maxWidth: 103,
-  };
-
-  const chipCloseStyle: CSSProperties = {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    cursor: "pointer",
-    flexShrink: 0,
-    width: 12,
-    height: 12,
-  };
-
-  const inlineSearchStyle: CSSProperties = {
-    border: "none",
-    outline: "none",
-    fontFamily: FONT_FAMILY,
-    fontSize: 16,
-    fontWeight: 400,
-    lineHeight: "24px",
-    color: COLORS.valueText,
-    backgroundColor: "transparent",
-    padding: 0,
-    minWidth: 40,
-    width: 60,
-    flexShrink: 1,
-  };
-
-  const textWrap: CSSProperties = {
-    display: "flex",
-    flex: "1 0 0",
-    alignItems: "center",
-    minWidth: 0,
-    minHeight: 0,
-    paddingLeft: 8,
-    paddingRight: 8,
-  };
-
-  const textStyle: CSSProperties = {
-    fontFamily: FONT_FAMILY,
-    fontSize: 16,
-    fontWeight: 400,
-    lineHeight: "24px",
-    color: selectedOption ? COLORS.text : COLORS.placeholder,
-    whiteSpace: "nowrap",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-  };
-
-  const iconBtn: CSSProperties = {
-    display: "flex",
-    alignItems: "center",
-    flexShrink: 0,
-    width: 24,
-    height: 24,
-    justifyContent: "center",
-    overflow: "hidden",
-    cursor: "pointer",
-  };
-
-  const dropdown: CSSProperties = {
-    position: "absolute",
-    top: "calc(100% + 4px)",
-    left: 0,
-    right: 0,
-    backgroundColor: COLORS.background,
-    border: `1px solid ${COLORS.borderDefault}`,
-    borderRadius: 4,
-    boxShadow: COLORS.dropdownShadow,
-    zIndex: 1000,
-    maxHeight: 296,
-    overflowY: "auto",
-    padding: "8px 0",
-    boxSizing: "border-box",
-  };
-
-  const searchWrap: CSSProperties = {
-    display: "flex",
-    alignItems: "center",
-    gap: 8,
-    padding: "8px 12px",
-    borderBottom: `1px solid ${COLORS.searchBorder}`,
-  };
-
-  const searchInputStyle: CSSProperties = {
-    flex: 1,
-    border: "none",
-    outline: "none",
-    fontFamily: FONT_FAMILY,
-    fontSize: 14,
-    fontWeight: 400,
-    lineHeight: "20px",
-    color: COLORS.text,
-    backgroundColor: "transparent",
-    padding: 0,
-  };
-
-  const optionBase: CSSProperties = {
-    display: "flex",
-    alignItems: "center",
-    gap: 10,
-    padding: "8px 16px",
-    fontFamily: FONT_FAMILY,
-    fontSize: 16,
-    fontWeight: 400,
-    lineHeight: "24px",
-    color: COLORS.valueText,
-    cursor: "pointer",
-    whiteSpace: "nowrap",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    height: 40,
-    boxSizing: "border-box",
-  };
-
-  const helperStyle: CSSProperties = {
-    fontFamily: FONT_FAMILY,
-    fontSize: 12,
-    fontWeight: 400,
-    lineHeight: "18px",
-    color: error ? COLORS.errorText : COLORS.label,
-    paddingLeft: 4,
-  };
-
-  const isOptionSelected = (optionValue: string): boolean => {
-    if (isMultiple) return multiValue.includes(optionValue);
+  const isOptionSelected = (optionValue: string) => {
+    if (isMultiple) {
+      return multiValue.includes(optionValue);
+    }
     return singleValue === optionValue;
   };
 
-  const shouldHighlight = searchable && searchHighlight && searchText.length > 0;
-
   return (
-    <div style={wrapper} ref={containerRef}>
+    <div className="flex w-full flex-col items-start gap-2" style={wrapperStyle} ref={containerRef}>
       {label && (
-        <div style={labelRow}>
-          <div style={labelContainer}>
-            <span style={labelStyle}>{label}</span>
-            {required && <span style={requiredMark} />}
+        <div className="flex items-center">
+          <div className="flex items-center justify-center gap-1">
+            <span className="whitespace-nowrap font-sans text-sm font-medium leading-[18px] text-[#52525b]">{label}</span>
+            {required && <span className="h-1.5 w-1.5 shrink-0 rounded-[3px] bg-[#36bffa]" />}
           </div>
         </div>
       )}
-      <div style={fieldBase} onClick={handleToggle}>
+      <div
+        className={cx(
+          "relative flex w-full items-center gap-2 rounded border bg-white p-2 box-border transition-colors duration-150 ease-in-out select-none",
+          hasChips && "flex-wrap",
+          disabled ? "cursor-not-allowed bg-[#fafafa] opacity-60" : "cursor-pointer",
+          error ? "border-[#f04438]" : open ? "border-[#7a5af8]" : "border-[#e4e7ec]"
+        )}
+        style={style}
+        onClick={handleToggle}
+      >
         {hasChips ? (
-          <div style={chipsWrap}>
+          <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1 pl-1">
             {selectedOptions.map((opt) => (
-              <div key={opt.value} style={chipStyle}>
-                <span style={chipTextStyle}>{opt.label}</span>
+              <div key={opt.value} className="flex max-w-[130px] shrink-0 items-center justify-center gap-1 rounded-md bg-[#fafaff] px-1.5 py-[3px]">
+                <span className="max-w-[103px] overflow-hidden text-ellipsis whitespace-nowrap font-sans text-xs font-medium leading-3 text-[#52525b]">
+                  {opt.label}
+                </span>
                 <span
-                  style={chipCloseStyle}
+                  className="flex h-3 w-3 shrink-0 items-center justify-center cursor-pointer"
                   onClick={(e) => {
                     e.stopPropagation();
                     handleChipRemove(opt.value);
@@ -569,48 +331,49 @@ export function SelectBox(props: SelectBoxProps) {
                 onChange={(e) => setSearchText(e.target.value)}
                 onClick={(e) => e.stopPropagation()}
                 placeholder={searchPlaceholder}
-                style={inlineSearchStyle}
+                className="min-w-10 w-[60px] shrink border-none bg-transparent p-0 font-sans text-base font-normal leading-6 text-[#3f3f46] outline-none placeholder:text-[#a1a1aa]"
               />
             )}
           </div>
+        ) : searchable && isMultiple && open ? (
+          <div className="flex min-h-0 min-w-0 flex-1 items-center px-2">
+            <input
+              ref={inlineSearchRef}
+              type="text"
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              onClick={(e) => e.stopPropagation()}
+              placeholder={searchPlaceholder}
+              className="w-full flex-1 border-none bg-transparent p-0 font-sans text-base font-normal leading-6 text-[#3f3f46] outline-none placeholder:text-[#a1a1aa]"
+            />
+          </div>
         ) : (
-          <>
-            {searchable && isMultiple && open ? (
-              <div style={textWrap}>
-                <input
-                  ref={inlineSearchRef}
-                  type="text"
-                  value={searchText}
-                  onChange={(e) => setSearchText(e.target.value)}
-                  onClick={(e) => e.stopPropagation()}
-                  placeholder={searchPlaceholder}
-                  style={{ ...inlineSearchStyle, flex: 1, width: "100%" }}
-                />
-              </div>
-            ) : (
-              <div style={textWrap}>
-                <span style={textStyle}>
-                  {selectedOption ? selectedOption.label : placeholder}
-                </span>
-              </div>
-            )}
-          </>
+          <div className="flex min-h-0 min-w-0 flex-1 items-center px-2">
+            <span
+              className={cx(
+                "overflow-hidden text-ellipsis whitespace-nowrap font-sans text-base font-normal leading-6",
+                selectedOption ? "text-[#18181b]" : "text-[#a1a1aa]"
+              )}
+            >
+              {selectedOption ? selectedOption.label : placeholder}
+            </span>
+          </div>
         )}
         {hasClearable && !disabled && (
-          <span style={iconBtn} onClick={handleClearAll}>
+          <span className="flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center overflow-hidden" onClick={handleClearAll}>
             <ClearIcon />
           </span>
         )}
-        <span style={iconBtn}>
+        <span className="flex h-6 w-6 shrink-0 items-center justify-center overflow-hidden">
           <ChevronDownIcon rotated={open} />
         </span>
         {open && (
           <div
-            style={dropdown}
+            className="absolute left-0 right-0 top-[calc(100%+4px)] z-[1000] max-h-[296px] overflow-y-auto rounded border border-[#e4e7ec] bg-white py-2 shadow-[0px_16px_32px_rgba(23,37,76,0.12)] box-border"
             onClick={(e) => e.stopPropagation()}
           >
             {searchable && !isMultiple && (
-              <div style={searchWrap}>
+              <div className="flex items-center gap-2 border-b border-[#e4e7ec] px-3 py-2">
                 <SearchIcon />
                 <input
                   ref={searchInputRef}
@@ -618,27 +381,16 @@ export function SelectBox(props: SelectBoxProps) {
                   value={searchText}
                   onChange={(e) => setSearchText(e.target.value)}
                   placeholder={searchPlaceholder}
-                  style={searchInputStyle}
+                  className="flex-1 border-none bg-transparent p-0 font-sans text-sm font-normal leading-5 text-[#18181b] outline-none placeholder:text-[#a1a1aa]"
                 />
               </div>
             )}
             {isMultiple && selectAllLabel && filteredOptions.length > 0 && (
               <div
-                style={{
-                  ...optionBase,
-                  backgroundColor: allFilteredSelected ? COLORS.activeBg : undefined,
-                  fontWeight: 500,
-                  borderBottom: `1px solid ${COLORS.searchBorder}`,
-                }}
-                onMouseEnter={(e) => {
-                  if (!allFilteredSelected) {
-                    (e.currentTarget as HTMLDivElement).style.backgroundColor = COLORS.hoverBg;
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLDivElement).style.backgroundColor =
-                    allFilteredSelected ? COLORS.activeBg : "";
-                }}
+                className={cx(
+                  "flex h-10 cursor-pointer items-center gap-2.5 border-b border-[#e4e7ec] px-4 py-2 font-sans text-base leading-6 text-[#3f3f46]",
+                  allFilteredSelected ? "bg-[#ede9fe] font-medium" : "font-medium hover:bg-[#f4f4f5]"
+                )}
                 onClick={handleSelectAll}
               >
                 <MiniCheckbox checked={allFilteredSelected} />
@@ -646,32 +398,22 @@ export function SelectBox(props: SelectBoxProps) {
               </div>
             )}
             {filteredOptions.length === 0 ? (
-              <div style={{ ...optionBase, color: COLORS.placeholder, cursor: "default" }}>
-                검색 결과가 없습니다
+              <div className="flex h-10 cursor-default items-center gap-2.5 px-4 py-2 font-sans text-base font-normal leading-6 text-[#a1a1aa]">
+                No results found
               </div>
             ) : (
               filteredOptions.map((option) => {
                 const selected = isOptionSelected(option.value);
                 const atLimit = !selected && isMultiple && maxSelections !== undefined && multiValue.length >= maxSelections;
+
                 return (
                   <div
                     key={option.value}
-                    style={{
-                      ...optionBase,
-                      backgroundColor: selected ? COLORS.activeBg : undefined,
-                      fontWeight: selected ? 500 : 400,
-                      opacity: atLimit ? 0.5 : 1,
-                      cursor: atLimit ? "not-allowed" : "pointer",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!selected && !atLimit) {
-                        (e.currentTarget as HTMLDivElement).style.backgroundColor = COLORS.hoverBg;
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      (e.currentTarget as HTMLDivElement).style.backgroundColor =
-                        selected ? COLORS.activeBg : "";
-                    }}
+                    className={cx(
+                      "flex h-10 items-center gap-2.5 px-4 py-2 font-sans text-base font-normal leading-6 text-[#3f3f46]",
+                      selected ? "bg-[#ede9fe] font-medium" : !atLimit && "hover:bg-[#f4f4f5]",
+                      atLimit ? "cursor-not-allowed opacity-50" : "cursor-pointer"
+                    )}
                     onClick={(e) => {
                       e.stopPropagation();
                       if (atLimit) return;
@@ -683,12 +425,8 @@ export function SelectBox(props: SelectBoxProps) {
                     }}
                   >
                     {isMultiple && <MiniCheckbox checked={selected} />}
-                    <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>
-                      {shouldHighlight ? (
-                        <HighlightedLabel label={option.label} searchText={searchText} />
-                      ) : (
-                        option.label
-                      )}
+                    <span className="overflow-hidden text-ellipsis">
+                      {shouldHighlight ? <HighlightedLabel label={option.label} searchText={searchText} /> : option.label}
                     </span>
                   </div>
                 );
@@ -697,7 +435,11 @@ export function SelectBox(props: SelectBoxProps) {
           </div>
         )}
       </div>
-      {helperText && <span style={helperStyle}>{helperText}</span>}
+      {helperText && (
+        <span className={cx("pl-1 font-sans text-xs font-normal leading-[18px]", error ? "text-[#f04438]" : "text-[#a1a1aa]")}>
+          {helperText}
+        </span>
+      )}
     </div>
   );
 }

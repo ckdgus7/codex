@@ -1,33 +1,6 @@
-import { useEffect } from "react";
-import type { CSSProperties } from "react";
+﻿import { useEffect } from "react";
 import { useMdiStore } from "@/shared/model/mdi.store";
 import { usePageHeader } from "@/shared/hooks/usePageHeader";
-
-const styles = {
-  outer: {
-    display: "flex",
-    flexDirection: "column",
-    flex: 1,
-    fontFamily: "'Pretendard', sans-serif",
-  } satisfies CSSProperties,
-  content: {
-    flex: 1,
-    padding: "20px 32px 20px",
-    overflow: "auto",
-    display: "flex",
-    flexDirection: "column",
-  } satisfies CSSProperties,
-  placeholder: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    flex: 1,
-    background: "#fff",
-    borderRadius: 8,
-    color: "#a1a1aa",
-    fontSize: 14,
-  } satisfies CSSProperties,
-};
 
 interface BlankPageProps {
   title: string;
@@ -49,9 +22,9 @@ export function BlankPage({ title, gnbName, path }: BlankPageProps) {
   }, [addTab, path, title]);
 
   return (
-    <div style={styles.outer}>
-      <div style={styles.content}>
-        <div style={styles.placeholder}>
+    <div className="flex flex-1 flex-col font-sans">
+      <div className="flex flex-1 flex-col overflow-auto px-8 py-5">
+        <div className="flex flex-1 items-center justify-center rounded-lg bg-white text-sm text-[#a1a1aa]">
           페이지 준비 중입니다.
         </div>
       </div>

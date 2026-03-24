@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback, useState, forwardRef, useImperativeHandle, type CSSProperties } from "react";
+﻿import { useEffect, useRef, useCallback, useState, forwardRef, useImperativeHandle, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
 import NavigatedViewer from "bpmn-js/lib/NavigatedViewer";
 import "bpmn-js/dist/assets/diagram-js.css";
@@ -24,6 +24,8 @@ interface BpmnViewerProps {
   style?: CSSProperties;
   className?: string;
 }
+
+const cx = (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(" ");
 
 function ZoomInIcon() {
   return (
@@ -117,77 +119,22 @@ function FullScreenViewer({ xml, onClose }: { xml: string; onClose: () => void }
   }, [xml]);
 
   return createPortal(
-    <div style={fullScreenStyles.overlay}>
-      <div style={fullScreenStyles.header}>
-        <div style={fullScreenStyles.toolbarGroup}>
-          <button type="button" style={fullScreenStyles.toolBtn} onClick={handleZoomIn} title="확대"><ZoomInIcon /></button>
-          <button type="button" style={fullScreenStyles.toolBtn} onClick={handleZoomOut} title="축소"><ZoomOutIcon /></button>
-          <button type="button" style={fullScreenStyles.toolBtn} onClick={handleFit} title="화면 맞춤"><FullScreenIcon /></button>
+    <div className="fixed inset-0 z-[9999] flex flex-col bg-white">
+      <div className="flex shrink-0 items-center justify-between border-b border-[#e4e7ec] px-5 py-3">
+        <div className="flex gap-1">
+          <button type="button" className="flex h-9 w-9 items-center justify-center rounded-md border border-[#e4e7ec] bg-white p-0" onClick={handleZoomIn} title="확대"><ZoomInIcon /></button>
+          <button type="button" className="flex h-9 w-9 items-center justify-center rounded-md border border-[#e4e7ec] bg-white p-0" onClick={handleZoomOut} title="축소"><ZoomOutIcon /></button>
+          <button type="button" className="flex h-9 w-9 items-center justify-center rounded-md border border-[#e4e7ec] bg-white p-0" onClick={handleFit} title="화면 맞춤"><FullScreenIcon /></button>
         </div>
-        <button type="button" style={fullScreenStyles.closeBtn} onClick={onClose} title="닫기">
+        <button type="button" className="flex h-9 w-9 items-center justify-center rounded-md bg-transparent p-0" onClick={onClose} title="닫기">
           <CloseIcon />
         </button>
       </div>
-      <div ref={containerRef} style={fullScreenStyles.viewerArea} />
+      <div ref={containerRef} className="h-full w-full flex-1 overflow-hidden" />
     </div>,
     document.body,
   );
 }
-
-const fullScreenStyles = {
-  overlay: {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    zIndex: 9999,
-    backgroundColor: "#ffffff",
-    display: "flex",
-    flexDirection: "column",
-  } satisfies CSSProperties,
-  header: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: "12px 20px",
-    borderBottom: "1px solid #e4e7ec",
-    flexShrink: 0,
-  } satisfies CSSProperties,
-  toolbarGroup: {
-    display: "flex",
-    gap: 4,
-  } satisfies CSSProperties,
-  toolBtn: {
-    width: 36,
-    height: 36,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    border: "1px solid #e4e7ec",
-    borderRadius: 6,
-    backgroundColor: "#ffffff",
-    cursor: "pointer",
-    padding: 0,
-  } satisfies CSSProperties,
-  closeBtn: {
-    width: 36,
-    height: 36,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    border: "none",
-    borderRadius: 6,
-    backgroundColor: "transparent",
-    cursor: "pointer",
-    padding: 0,
-  } satisfies CSSProperties,
-  viewerArea: {
-    flex: 1,
-    width: "100%",
-    overflow: "hidden",
-  } satisfies CSSProperties,
-};
 
 const BpmnViewer = forwardRef<BpmnViewerHandle, BpmnViewerProps>(function BpmnViewer({
   xml,
@@ -204,7 +151,7 @@ const BpmnViewer = forwardRef<BpmnViewerHandle, BpmnViewerProps>(function BpmnVi
 }: BpmnViewerProps, ref) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewerRef = useRef<NavigatedViewer | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [, setError] = useState<string | null>(null);
   const [fullScreen, setFullScreen] = useState(false);
 
   const handleZoomIn = useCallback(() => {
@@ -287,72 +234,26 @@ const BpmnViewer = forwardRef<BpmnViewerHandle, BpmnViewerProps>(function BpmnVi
       });
   }, [xml, fitOnImport]);
 
-  const containerStyle: CSSProperties = {
-    width,
-    height,
-    position: "relative",
-    overflow: "hidden",
-    border: "1px solid #e4e7ec",
-    borderRadius: 8,
-    backgroundColor: "#ffffff",
-    ...style,
-  };
-
-  const toolbarStyle: CSSProperties = {
-    position: "absolute",
-    top: 8,
-    right: 8,
-    display: "flex",
-    gap: 4,
-    zIndex: 10,
-    backgroundColor: "#ffffff",
-    borderRadius: 6,
-    boxShadow: "0 1px 4px rgba(0,0,0,0.12)",
-    padding: 4,
-  };
-
-  const toolBtnStyle: CSSProperties = {
-    width: 32,
-    height: 32,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    border: "1px solid #e4e7ec",
-    borderRadius: 4,
-    backgroundColor: "#ffffff",
-    cursor: "pointer",
-    padding: 0,
-  };
-
-  const errorStyle: CSSProperties = {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    color: "#f04438",
-    fontFamily: "'Pretendard', sans-serif",
-    fontSize: 14,
-    textAlign: "center",
-    padding: 24,
-    maxWidth: "80%",
-  };
-
   const handleCloseFullScreen = useCallback(() => setFullScreen(false), []);
 
   return (
-    <div style={containerStyle} className={className}>
-      <div ref={containerRef} style={{ width: "100%", height: "100%" }} />
-      {/* {error && <div style={errorStyle}>{error}</div>} */}
-      {xml && (
-      // {!error && xml && !hideToolbar && (
-        <div style={toolbarStyle}>
-          <button type="button" style={toolBtnStyle} onClick={handleZoomIn} title="확대">
+    <div
+      style={{ width, height, ...style }}
+      className={cx(
+        "relative overflow-hidden rounded-lg border border-[#e4e7ec] bg-white",
+        className,
+      )}
+    >
+      <div ref={containerRef} className="h-full w-full" />
+      {xml && !hideToolbar && (
+        <div className="absolute right-2 top-2 z-10 flex gap-1 rounded-md bg-white p-1 shadow-[0_1px_4px_rgba(0,0,0,0.12)]">
+          <button type="button" className="flex h-8 w-8 items-center justify-center rounded border border-[#e4e7ec] bg-white p-0" onClick={handleZoomIn} title="확대">
             <ZoomInIcon />
           </button>
-          <button type="button" style={toolBtnStyle} onClick={handleZoomOut} title="축소">
+          <button type="button" className="flex h-8 w-8 items-center justify-center rounded border border-[#e4e7ec] bg-white p-0" onClick={handleZoomOut} title="축소">
             <ZoomOutIcon />
           </button>
-          <button type="button" style={toolBtnStyle} onClick={() => setFullScreen(true)} title="전체화면">
+          <button type="button" className="flex h-8 w-8 items-center justify-center rounded border border-[#e4e7ec] bg-white p-0" onClick={() => setFullScreen(true)} title="전체화면">
             <FullScreenIcon />
           </button>
         </div>

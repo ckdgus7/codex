@@ -1,120 +1,12 @@
-import type { CSSProperties, ReactNode } from "react";
+﻿import type { ReactNode } from "react";
 import { useFavoritesStore } from "@/shared/model/favorites.store";
 
-const FONT_FAMILY = "'Pretendard', sans-serif";
-
-const st = {
-  header: {
-    display: "flex",
-    flexWrap: "wrap",
-    alignItems: "center",
-    alignContent: "center",
-    gap: 16,
-    width: "100%",
-    flexShrink: 0,
-  } satisfies CSSProperties,
-  leadingFunction: {
-    display: "flex",
-    alignItems: "center",
-    flexShrink: 0,
-  } satisfies CSSProperties,
-  backBtn: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    border: "1px solid #18181b",
-    background: "white",
-    cursor: "pointer",
-    padding: 3,
-    borderRadius: 4,
-    flexShrink: 0,
-    width: 24,
-    height: 24,
-    boxSizing: "border-box",
-  } satisfies CSSProperties,
-  titleArea: {
-    display: "flex",
-    flex: "1 0 0",
-    flexWrap: "wrap",
-    alignItems: "center",
-    alignContent: "center",
-    gap: "8px 16px",
-    minWidth: 360,
-    minHeight: 1,
-  } satisfies CSSProperties,
-  badgeWrap: {
-    display: "flex",
-    alignItems: "center",
-    gap: 0,
-    flexShrink: 0,
-  } satisfies CSSProperties,
-  titleText: {
-    fontSize: 32,
-    fontWeight: 700,
-    color: "#18181b",
-    lineHeight: "40px",
-    fontFamily: FONT_FAMILY,
-    fontStyle: "normal",
-    whiteSpace: "nowrap",
-    flexShrink: 0,
-  } satisfies CSSProperties,
-  badgeBase: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: "4px 12px",
-    borderRadius: 12,
-    borderWidth: 1,
-    borderStyle: "solid",
-    fontSize: 14,
-    fontWeight: 500,
-    lineHeight: "16px",
-    fontFamily: FONT_FAMILY,
-    whiteSpace: "nowrap",
-    flexShrink: 0,
-  } satisfies CSSProperties,
-  badgeStatus: {
-    borderColor: "#7a5af8",
-    background: "#fafaff",
-    color: "#7a5af8",
-  } satisfies CSSProperties,
-  badgeId: {
-    borderColor: "#36bffa",
-    background: "white",
-    color: "#36bffa",
-  } satisfies CSSProperties,
-  functionWrap: {
-    display: "flex",
-    alignItems: "center",
-    gap: 8,
-    flexShrink: 0,
-  } satisfies CSSProperties,
-  iconBtn: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    border: "1px solid #18181b",
-    background: "white",
-    cursor: "pointer",
-    padding: 3,
-    borderRadius: 4,
-    flexShrink: 0,
-    width: 24,
-    height: 24,
-    boxSizing: "border-box",
-  } satisfies CSSProperties,
-  ctaWrap: {
-    display: "flex",
-    alignItems: "center",
-    gap: 8,
-    marginLeft: "auto",
-    flexShrink: 0,
-  } satisfies CSSProperties,
-};
+const cx = (...classes: Array<string | false | null | undefined>) =>
+  classes.filter(Boolean).join(" ");
 
 function BackArrowIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{ overflow: "hidden" }}>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="overflow-hidden">
       <path
         d="M14.5 7.43L9.93 12l4.57 4.57"
         stroke="#18181b"
@@ -128,7 +20,7 @@ function BackArrowIcon() {
 
 function FavIcon({ filled }: { filled: boolean }) {
   return (
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style={{ overflow: "hidden", flexShrink: 0 }}>
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" className="shrink-0 overflow-hidden">
       <path
         d="M9 11.1L6.37 12.57l.5-2.93L4.8 7.65l2.94-.43L9 4.49l1.26 2.73 2.94.43-2.07 2-0.01-.01.5 2.93L9 11.1z"
         stroke={filled ? "#EAAA08" : "#18181b"}
@@ -142,7 +34,7 @@ function FavIcon({ filled }: { filled: boolean }) {
 
 function RefreshIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{ overflow: "hidden", flexShrink: 0 }}>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="shrink-0 overflow-hidden">
       <path
         d="M4 12a8 8 0 0114.93-4M20 12a8 8 0 01-14.93 4"
         stroke="#18181b"
@@ -187,32 +79,40 @@ export function PageTitle({
   const starred = favoriteKey ? isFavorite(favoriteKey) : false;
 
   return (
-    <div style={st.header}>
+    <div className="flex w-full shrink-0 flex-wrap items-center content-center gap-4">
       {onBack && (
-        <div style={st.leadingFunction}>
-          <button style={st.backBtn} onClick={onBack} title="뒤로 가기">
+        <div className="flex shrink-0 items-center">
+          <button
+            className="flex h-6 w-6 shrink-0 items-center justify-center rounded border border-[#18181b] bg-white p-[3px] box-border"
+            onClick={onBack}
+            title="뒤로 가기"
+          >
             <BackArrowIcon />
           </button>
         </div>
       )}
 
-      <div style={st.titleArea}>
+      <div className="flex min-h-px min-w-[360px] flex-1 flex-wrap items-center content-center gap-x-4 gap-y-2">
         {idBadge && (
-          <div style={st.badgeWrap}>
-            <span style={{ ...st.badgeBase, ...st.badgeId }}>{idBadge}</span>
+          <div className="flex shrink-0 items-center">
+            <span className="flex shrink-0 items-center justify-center whitespace-nowrap rounded-xl border border-[#36bffa] bg-white px-3 py-1 font-sans text-sm font-medium leading-4 text-[#36bffa]">
+              {idBadge}
+            </span>
           </div>
         )}
-        <span style={st.titleText}>{title}</span>
+        <span className="shrink-0 whitespace-nowrap font-sans text-[32px] font-bold leading-10 text-[#18181b]">{title}</span>
         {badge && (
-          <div style={st.badgeWrap}>
-            <span style={{ ...st.badgeBase, ...st.badgeStatus }}>{badge}</span>
+          <div className="flex shrink-0 items-center">
+            <span className="flex shrink-0 items-center justify-center whitespace-nowrap rounded-xl border border-[#7a5af8] bg-[#fafaff] px-3 py-1 font-sans text-sm font-medium leading-4 text-[#7a5af8]">
+              {badge}
+            </span>
           </div>
         )}
         {(favoriteKey || showRefresh) && (
-          <div style={st.functionWrap}>
+          <div className="flex shrink-0 items-center gap-2">
             {favoriteKey && (
               <button
-                style={st.iconBtn}
+                className="flex h-6 w-6 shrink-0 items-center justify-center rounded border border-[#18181b] bg-white p-[3px] box-border"
                 onClick={() => toggleFavorite(favoriteKey)}
                 title={starred ? "즐겨찾기 해제" : "즐겨찾기 추가"}
               >
@@ -221,7 +121,7 @@ export function PageTitle({
             )}
             {showRefresh && (
               <button
-                style={st.iconBtn}
+                className="flex h-6 w-6 shrink-0 items-center justify-center rounded border border-[#18181b] bg-white p-[3px] box-border"
                 onClick={onRefresh}
                 title="새로고침"
               >
@@ -232,7 +132,7 @@ export function PageTitle({
         )}
       </div>
 
-      {actions && <div style={st.ctaWrap}>{actions}</div>}
+      {actions && <div className="ml-auto flex shrink-0 items-center gap-2">{actions}</div>}
     </div>
   );
 }

@@ -1,19 +1,5 @@
-import type { CSSProperties, ReactNode } from "react";
+import { type ReactNode } from "react";
 import { Outlet } from "react-router";
-const styles = {
-  container: {
-    display: "flex",
-    height: "100vh",
-    width: "100%",
-    fontFamily: "'Pretendard', sans-serif",
-  } satisfies CSSProperties,
-  content: {
-    flex: 1,
-    overflow: "auto",
-    background: "#f5f5f5",
-    position: "relative",
-  } satisfies CSSProperties,
-};
 
 interface LayoutProps {
   children: ReactNode;
@@ -23,8 +9,10 @@ interface LayoutProps {
 
 export function Layout() {
   return (
-    <div style={styles.container}>
-      <main style={styles.content}><Outlet /></main>
+    <div className="flex h-screen w-full font-sans">
+      <main className="relative flex-1 overflow-auto bg-[#f5f5f5]">
+        <Outlet />
+      </main>
     </div>
   );
 }

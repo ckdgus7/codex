@@ -12,12 +12,6 @@ interface ToastEditorProps {
   maxLength?: number;
 }
 
-const wrapperStyle: CSSProperties = {
-  width: "100%",
-  borderRadius: 4,
-  overflow: "hidden",
-};
-
 function stripHtml(html: string): string {
   return html.replace(/<[^>]*>/g, "").replace(/&nbsp;/g, " ");
 }
@@ -109,7 +103,7 @@ export function ToastEditor({
   }, [value]);
 
   return (
-    <div style={wrapperStyle}>
+    <div className="w-full overflow-hidden rounded" style={{ minHeight } satisfies CSSProperties}>
       <div ref={editorRef} />
     </div>
   );

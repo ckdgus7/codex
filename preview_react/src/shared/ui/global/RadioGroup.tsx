@@ -20,150 +20,37 @@ interface RadioGroupProps {
   style?: CSSProperties;
 }
 
-const FONT_FAMILY = "'Pretendard', sans-serif";
+const cx = (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(" ");
 
-const COLORS = {
-  checkedBg: "#7a5af8",
-  uncheckedBg: "#ffffff",
-  uncheckedBorder: "#e4e7ec",
-  innerDot: "#ffffff",
-  innerDotUnchecked: "#71717a",
-  disabledBg: "#71717a",
-  labelText: "#3f3f46",
+const SIZE_CLASSES: Record<RadioSize, { circle: string; dot: string; label: string; gap: string }> = {
+  l: { circle: "h-6 w-6 rounded-full", dot: "h-2 w-2 rounded", label: "text-base leading-6", gap: "gap-2" },
+  m: { circle: "h-5 w-5 rounded-full", dot: "h-2 w-2 rounded", label: "text-sm leading-5", gap: "gap-2" },
+  s: { circle: "h-[18px] w-[18px] rounded-full", dot: "h-1.5 w-1.5 rounded-[3px]", label: "text-xs leading-[18px]", gap: "gap-2" },
 };
 
-const SIZE_CONFIG: Record<
-  RadioSize,
-  {
-    circle: number;
-    borderRadius: number;
-    innerDot: number;
-    innerDotRadius: number;
-    fontSize: number;
-    lineHeight: string;
-    gap: number;
-  }
-> = {
-  l: { circle: 24, borderRadius: 12, innerDot: 8, innerDotRadius: 4, fontSize: 16, lineHeight: "24px", gap: 8 },
-  m: { circle: 20, borderRadius: 10, innerDot: 8, innerDotRadius: 4, fontSize: 14, lineHeight: "20px", gap: 8 },
-  s: { circle: 18, borderRadius: 9, innerDot: 6, innerDotRadius: 3, fontSize: 12, lineHeight: "18px", gap: 8 },
-};
-
-function RadioItem({
-  option,
-  selected,
-  size,
-  globalDisabled,
-  onChange,
-}: {
-  option: RadioOption;
-  selected: boolean;
-  size: RadioSize;
-  globalDisabled: boolean;
-  onChange: (value: string) => void;
-}) {
-  const config = SIZE_CONFIG[size];
+function RadioItem({ option, selected, size, globalDisabled, onChange }: { option: RadioOption; selected: boolean; size: RadioSize; globalDisabled: boolean; onChange: (value: string) => void }) {
   const isDisabled = globalDisabled || option.disabled;
-
-  const itemStyle: CSSProperties = {
-    display: "flex",
-    gap: config.gap,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 4,
-    cursor: isDisabled ? "not-allowed" : "pointer",
-    userSelect: "none",
-  };
-
-  const circleStyle: CSSProperties = {
-    width: config.circle,
-    height: config.circle,
-    borderRadius: config.borderRadius,
-    overflow: "hidden",
-    flexShrink: 0,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    position: "relative",
-    boxSizing: "border-box",
-    ...(selected
-      ? {
-          backgroundColor: isDisabled ? COLORS.disabledBg : COLORS.checkedBg,
-          opacity: isDisabled ? 0.6 : 1,
-        }
-      : {
-          backgroundColor: COLORS.uncheckedBg,
-          border: `1px solid ${COLORS.uncheckedBorder}`,
-          opacity: isDisabled ? 0.6 : 1,
-        }),
-  };
-
-  const innerDotStyle: CSSProperties = {
-    width: config.innerDot,
-    height: config.innerDot,
-    borderRadius: config.innerDotRadius,
-    backgroundColor: selected ? COLORS.innerDot : COLORS.innerDotUnchecked,
-    opacity: selected ? 1 : 0.3,
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-  };
-
-  const labelStyle: CSSProperties = {
-    fontFamily: FONT_FAMILY,
-    fontSize: config.fontSize,
-    fontWeight: 400,
-    lineHeight: config.lineHeight,
-    color: COLORS.labelText,
-    whiteSpace: "nowrap",
-  };
-
-  const handleClick = () => {
-    if (!isDisabled) {
-      onChange(option.value);
-    }
-  };
+  const sizeClasses = SIZE_CLASSES[size];
 
   return (
-    <div style={itemStyle} onClick={handleClick}>
-      <div style={circleStyle}>
-        <div style={innerDotStyle} />
+    <div className={cx("flex select-none items-center justify-center rounded", sizeClasses.gap, isDisabled ? "cursor-not-allowed" : "cursor-pointer")} onClick={() => !isDisabled && onChange(option.value)}>
+      <div className={cx(
+        "relative flex shrink-0 items-center justify-center overflow-hidden box-border",
+        sizeClasses.circle,
+        selected ? (isDisabled ? "bg-[#71717a] opacity-60" : "bg-[#7a5af8]") : (isDisabled ? "border border-[#e4e7ec] bg-white opacity-60" : "border border-[#e4e7ec] bg-white")
+      )}>
+        <div className={cx("absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2", sizeClasses.dot, selected ? "bg-white opacity-100" : "bg-[#71717a] opacity-30")} />
       </div>
-      <span style={labelStyle}>{option.label}</span>
+      <span className={cx("whitespace-nowrap font-sans font-normal text-[#3f3f46]", sizeClasses.label)}>{option.label}</span>
     </div>
   );
 }
 
-export function RadioGroup({
-  value,
-  onChange,
-  options,
-  size = "m",
-  disabled = false,
-  direction = "horizontal",
-  gap = 16,
-  style,
-}: RadioGroupProps) {
-  const groupStyle: CSSProperties = {
-    display: "flex",
-    flexDirection: direction === "horizontal" ? "row" : "column",
-    gap,
-    alignItems: direction === "horizontal" ? "center" : "flex-start",
-    ...style,
-  };
-
+export function RadioGroup({ value, onChange, options, size = "m", disabled = false, direction = "horizontal", gap = 16, style }: RadioGroupProps) {
   return (
-    <div style={groupStyle}>
+    <div className={cx("flex", direction === "horizontal" ? "flex-row items-center" : "flex-col items-start")} style={{ gap, ...style }}>
       {options.map((option) => (
-        <RadioItem
-          key={option.value}
-          option={option}
-          selected={value === option.value}
-          size={size}
-          globalDisabled={disabled}
-          onChange={onChange}
-        />
+        <RadioItem key={option.value} option={option} selected={value === option.value} size={size} globalDisabled={disabled} onChange={onChange} />
       ))}
     </div>
   );

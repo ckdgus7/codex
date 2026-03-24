@@ -1,5 +1,4 @@
-import { useState, useRef, useCallback, type CSSProperties } from "react";
-import { FONT } from "@/shared/ui/styles";
+﻿import { useState, useRef, useCallback } from "react";
 
 interface UploadedFile {
   id: string;
@@ -14,6 +13,8 @@ interface FileUploadProps {
   dragText?: string;
   buttonText?: string;
 }
+
+const cx = (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(" ");
 
 function UploadIcon() {
   return (
@@ -42,100 +43,15 @@ function DeleteIcon() {
   );
 }
 
-const s = {
-  uploadArea: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    padding: "24px 16px",
-    border: "1px dashed #d4d4d8",
-    borderRadius: 8,
-    cursor: "pointer",
-    transition: "border-color 0.15s",
-  } satisfies CSSProperties,
-  uploadAreaDragging: {
-    borderColor: "#7a5af8",
-    backgroundColor: "#fafaff",
-  } satisfies CSSProperties,
-  uploadText: {
-    fontFamily: FONT,
-    fontSize: 13,
-    color: "#a1a1aa",
-    lineHeight: "18px",
-    textAlign: "center",
-  } satisfies CSSProperties,
-  uploadBtn: {
-    fontFamily: FONT,
-    fontSize: 13,
-    fontWeight: 500,
-    color: "#7a5af8",
-    background: "none",
-    border: "1px solid #7a5af8",
-    borderRadius: 6,
-    padding: "6px 16px",
-    cursor: "pointer",
-    lineHeight: "18px",
-  } satisfies CSSProperties,
-  fileList: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 4,
-    marginTop: 8,
-  } satisfies CSSProperties,
-  fileItem: {
-    display: "flex",
-    alignItems: "center",
-    gap: 8,
-    padding: "6px 8px",
-    borderRadius: 6,
-    backgroundColor: "#fafafa",
-  } satisfies CSSProperties,
-  fileName: {
-    fontFamily: FONT,
-    fontSize: 13,
-    color: "#18181b",
-    lineHeight: "18px",
-    flex: 1,
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
-  } satisfies CSSProperties,
-  fileDeleteBtn: {
-    background: "none",
-    border: "none",
-    padding: 2,
-    cursor: "pointer",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    flexShrink: 0,
-  } satisfies CSSProperties,
-};
-
-export function FileUpload({
-  value,
-  onChange,
-  multiple = true,
-  accept,
-  dragText = "파일을 드래그하거나 클릭하여 업로드하세요.",
-  buttonText = "파일 선택",
-}: FileUploadProps) {
+export function FileUpload({ value, onChange, multiple = true, accept, dragText = "파일을 드래그하거나 클릭하여 업로드해주세요.", buttonText = "파일 선택" }: FileUploadProps) {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dragCounterRef = useRef(0);
 
-  const addFiles = useCallback(
-    (fileList: FileList) => {
-      const newFiles: UploadedFile[] = Array.from(fileList).map((f) => ({
-        id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
-        name: f.name,
-      }));
-      onChange([...value, ...newFiles]);
-    },
-    [value, onChange],
-  );
+  const addFiles = useCallback((fileList: FileList) => {
+    const newFiles: UploadedFile[] = Array.from(fileList).map((f) => ({ id: `${Date.now()}-${Math.random().toString(36).slice(2)}`, name: f.name }));
+    onChange([...value, ...newFiles]);
+  }, [value, onChange]);
 
   const handleClick = () => {
     fileInputRef.current?.click();
@@ -156,18 +72,14 @@ export function FileUpload({
     e.preventDefault();
     e.stopPropagation();
     dragCounterRef.current += 1;
-    if (e.dataTransfer.types.includes("Files")) {
-      setIsDragging(true);
-    }
+    if (e.dataTransfer.types.includes("Files")) setIsDragging(true);
   };
 
   const handleDragLeave = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     dragCounterRef.current -= 1;
-    if (dragCounterRef.current === 0) {
-      setIsDragging(false);
-    }
+    if (dragCounterRef.current === 0) setIsDragging(false);
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -187,16 +99,12 @@ export function FileUpload({
 
   return (
     <div>
-      <input
-        ref={fileInputRef}
-        type="file"
-        multiple={multiple}
-        accept={accept}
-        style={{ display: "none" }}
-        onChange={handleFileChange}
-      />
+      <input ref={fileInputRef} type="file" multiple={multiple} accept={accept} className="hidden" onChange={handleFileChange} />
       <div
-        style={isDragging ? { ...s.uploadArea, ...s.uploadAreaDragging } : s.uploadArea}
+        className={cx(
+          "flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-[#d4d4d8] px-4 py-6 transition-colors duration-150",
+          isDragging && "border-[#7a5af8] bg-[#fafaff]"
+        )}
         onClick={handleClick}
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
@@ -204,9 +112,9 @@ export function FileUpload({
         onDrop={handleDrop}
       >
         <UploadIcon />
-        <span style={s.uploadText}>{dragText}</span>
+        <span className="text-center font-sans text-[13px] leading-[18px] text-[#a1a1aa]">{dragText}</span>
         <button
-          style={s.uploadBtn}
+          className="rounded-md border border-[#7a5af8] bg-none px-4 py-1.5 font-sans text-[13px] font-medium leading-[18px] text-[#7a5af8]"
           type="button"
           onClick={(e) => {
             e.stopPropagation();
@@ -217,15 +125,12 @@ export function FileUpload({
         </button>
       </div>
       {value.length > 0 && (
-        <div style={s.fileList}>
+        <div className="mt-2 flex flex-col gap-1">
           {value.map((file) => (
-            <div key={file.id} style={s.fileItem}>
+            <div key={file.id} className="flex items-center gap-2 rounded-md bg-[#fafafa] px-2 py-1.5">
               <FileIcon />
-              <span style={s.fileName}>{file.name}</span>
-              <button
-                style={s.fileDeleteBtn}
-                onClick={() => handleDelete(file.id)}
-              >
+              <span className="flex-1 overflow-hidden text-ellipsis whitespace-nowrap font-sans text-[13px] leading-[18px] text-[#18181b]">{file.name}</span>
+              <button className="flex shrink-0 items-center justify-center border-none bg-none p-0.5" onClick={() => handleDelete(file.id)} aria-label="삭제">
                 <DeleteIcon />
               </button>
             </div>

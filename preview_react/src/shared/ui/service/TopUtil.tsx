@@ -1,53 +1,10 @@
-import type { CSSProperties } from "react";
-import { FONT } from "@/shared/ui/styles";
-
-interface TopUtilProps {
+﻿interface TopUtilProps {
   onBellClick?: () => void;
   onUserClick?: () => void;
   onChatClick?: () => void;
   bellNotification?: boolean;
   chatNotification?: boolean;
 }
-
-const s = {
-  wrapper: {
-    display: "flex",
-    alignItems: "center",
-    gap: 4,
-    flexShrink: 0,
-    padding: "0 12px",
-  } satisfies CSSProperties,
-  iconBtn: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    width: 32,
-    height: 32,
-    background: "none",
-    border: "none",
-    borderRadius: 6,
-    cursor: "pointer",
-    position: "relative",
-    padding: 0,
-    flexShrink: 0,
-  } satisfies CSSProperties,
-  separator: {
-    width: 1,
-    height: 16,
-    backgroundColor: "#e4e4e7",
-    margin: "0 4px",
-    flexShrink: 0,
-  } satisfies CSSProperties,
-  notificationDot: {
-    position: "absolute",
-    top: 4,
-    right: 4,
-    width: 6,
-    height: 6,
-    borderRadius: "50%",
-    backgroundColor: "#f04438",
-  } satisfies CSSProperties,
-};
 
 function BellIcon() {
   return (
@@ -107,17 +64,17 @@ export function TopUtil({
   chatNotification = false,
 }: TopUtilProps) {
   return (
-    <div style={s.wrapper}>
-      {/* <button style={s.iconBtn} onClick={onChatClick} title="채팅">
+    <div className="flex shrink-0 items-center gap-1 px-3">
+      {/* <button className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-md border-none bg-none p-0" onClick={onChatClick} title="채팅">
         <ChatIcon />
-        {chatNotification && <span style={s.notificationDot} />}
+        {chatNotification && <span className="absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-[#f04438]" />}
       </button> */}
-      <button style={s.iconBtn} onClick={onBellClick} title="알림">
+      <button className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-md border-none bg-transparent p-0" onClick={onBellClick} title="알림">
         <BellIcon />
-        {bellNotification && <span style={s.notificationDot} />}
+        {bellNotification && <span className="absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-[#f04438]" />}
       </button>
-      <div style={s.separator} />
-      <button style={s.iconBtn} onClick={onUserClick} title="사용자">
+      <div className="mx-1 h-4 w-px shrink-0 bg-[#e4e4e7]" />
+      <button className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-md border-none bg-transparent p-0" onClick={onUserClick} title="사용자 정보">
         <UserIcon />
       </button>
     </div>

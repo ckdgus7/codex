@@ -1,12 +1,13 @@
-import type { CSSProperties, ReactNode, ButtonHTMLAttributes } from "react";
+import type { CSSProperties, ReactNode, ButtonHTMLAttributes, HTMLAttributes } from "react";
 
-const FONT_FAMILY = "'Pretendard', sans-serif";
+const cx = (...classes: Array<string | false | null | undefined>) =>
+  classes.filter(Boolean).join(" ");
 
 type ButtonSize = "l" | "m" | "s";
 type ButtonVariant = "filled" | "outlined" | "text";
 type ButtonColor = "positive" | "negative" | "warning" | "success" | "info";
 
-interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "style"> {
+interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "style" | "className"> {
   size?: ButtonSize;
   variant?: ButtonVariant;
   color?: ButtonColor;
@@ -14,124 +15,51 @@ interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "sty
   trailingIcon?: ReactNode;
   children?: ReactNode;
   style?: CSSProperties;
+  className?: string;
+  wrapperStyle?: HTMLAttributes<HTMLDivElement>["style"];
 }
 
-const COLOR_MAP: Record<ButtonColor, string> = {
-  positive: "#7a5af8",
-  negative: "#f04438",
-  warning: "#f79009",
-  success: "#1ac057",
-  info: "#71717a",
-};
-
-const SIZE_CONFIG: Record<
-  ButtonSize,
-  {
-    height: number;
-    padding: number;
-    iconSize: number;
-    fontSize: number;
-    fontWeight: number;
-    lineHeight: string;
-    textPaddingX: number;
-    borderWidth: number;
-  }
-> = {
+const SIZE_CLASSES: Record<ButtonSize, { button: string; icon: string; text: string }> = {
   l: {
-    height: 40,
-    padding: 8,
-    iconSize: 24,
-    fontSize: 16,
-    fontWeight: 700,
-    lineHeight: "24px",
-    textPaddingX: 6,
-    borderWidth: 1,
+    button: "h-10 p-2",
+    icon: "h-6 w-6",
+    text: "px-1.5 text-base font-bold leading-6",
   },
   m: {
-    height: 32,
-    padding: 6,
-    iconSize: 20,
-    fontSize: 14,
-    fontWeight: 500,
-    lineHeight: "20px",
-    textPaddingX: 6,
-    borderWidth: 1,
+    button: "h-8 p-1.5",
+    icon: "h-5 w-5",
+    text: "px-1.5 text-sm font-medium leading-5",
   },
   s: {
-    height: 24,
-    padding: 4,
-    iconSize: 18,
-    fontSize: 12,
-    fontWeight: 400,
-    lineHeight: "18px",
-    textPaddingX: 6,
-    borderWidth: 1,
+    button: "h-6 p-1",
+    icon: "h-[18px] w-[18px]",
+    text: "px-1.5 text-xs font-normal leading-[18px]",
   },
 };
 
-function getButtonStyles(
-  size: ButtonSize,
-  variant: ButtonVariant,
-  color: ButtonColor,
-  disabled: boolean
-): { base: CSSProperties; text: CSSProperties; icon: CSSProperties } {
-  const sizeConfig = SIZE_CONFIG[size];
-  const colorValue = COLOR_MAP[color];
-
-  const baseStyle: CSSProperties = {
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: sizeConfig.padding,
-    borderRadius: 4,
-    border: "none",
-    cursor: disabled ? "not-allowed" : "pointer",
-    opacity: disabled ? 0.4 : 1,
-    boxSizing: "border-box",
-    height: sizeConfig.height,
-    outline: "none",
-    fontFamily: FONT_FAMILY,
-    transition: "opacity 0.15s ease",
-  };
-
-  const textStyle: CSSProperties = {
-    fontFamily: FONT_FAMILY,
-    fontSize: sizeConfig.fontSize,
-    fontWeight: sizeConfig.fontWeight,
-    lineHeight: sizeConfig.lineHeight,
-    textAlign: "center",
-    whiteSpace: "nowrap",
-    paddingLeft: sizeConfig.textPaddingX,
-    paddingRight: sizeConfig.textPaddingX,
-  };
-
-  const iconStyle: CSSProperties = {
-    width: sizeConfig.iconSize,
-    height: sizeConfig.iconSize,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    flexShrink: 0,
-    overflow: "hidden",
-  };
-
-  if (variant === "filled") {
-    baseStyle.backgroundColor = colorValue;
-    baseStyle.color = "#ffffff";
-    textStyle.color = "#ffffff";
-  } else if (variant === "outlined") {
-    baseStyle.backgroundColor = "#ffffff";
-    baseStyle.border = `${sizeConfig.borderWidth}px solid ${colorValue}`;
-    baseStyle.color = colorValue;
-    textStyle.color = colorValue;
-  } else {
-    baseStyle.backgroundColor = "transparent";
-    baseStyle.color = colorValue;
-    textStyle.color = colorValue;
-  }
-
-  return { base: baseStyle, text: textStyle, icon: iconStyle };
-}
+const VARIANT_CLASSES: Record<ButtonVariant, Record<ButtonColor, string>> = {
+  filled: {
+    positive: "bg-[#7a5af8] text-white",
+    negative: "bg-[#f04438] text-white",
+    warning: "bg-[#f79009] text-white",
+    success: "bg-[#1ac057] text-white",
+    info: "bg-[#71717a] text-white",
+  },
+  outlined: {
+    positive: "border border-[#7a5af8] bg-white text-[#7a5af8]",
+    negative: "border border-[#f04438] bg-white text-[#f04438]",
+    warning: "border border-[#f79009] bg-white text-[#f79009]",
+    success: "border border-[#1ac057] bg-white text-[#1ac057]",
+    info: "border border-[#71717a] bg-white text-[#71717a]",
+  },
+  text: {
+    positive: "bg-transparent text-[#7a5af8]",
+    negative: "bg-transparent text-[#f04438]",
+    warning: "bg-transparent text-[#f79009]",
+    success: "bg-transparent text-[#1ac057]",
+    info: "bg-transparent text-[#71717a]",
+  },
+};
 
 export function Button({
   size = "l",
@@ -142,19 +70,37 @@ export function Button({
   children,
   disabled = false,
   style,
+  className,
+  wrapperStyle,
   ...rest
 }: ButtonProps) {
-  const styles = getButtonStyles(size, variant, color, disabled);
+  const sizeClasses = SIZE_CLASSES[size];
 
   return (
-    <button
-      disabled={disabled}
-      style={{ ...styles.base, ...style }}
-      {...rest}
-    >
-      {leadingIcon && <span style={styles.icon}>{leadingIcon}</span>}
-      {children != null && <span style={styles.text}>{children}</span>}
-      {trailingIcon && <span style={styles.icon}>{trailingIcon}</span>}
-    </button>
+    <div className={className} style={wrapperStyle}>
+      <button
+        disabled={disabled}
+        style={style}
+        className={cx(
+          "inline-flex items-center justify-center rounded border-0 font-sans box-border outline-none transition-opacity duration-150 ease-in-out",
+          "disabled:cursor-not-allowed disabled:opacity-40",
+          sizeClasses.button,
+          VARIANT_CLASSES[variant][color]
+        )}
+        {...rest}
+      >
+        {leadingIcon && (
+          <span className={cx("flex shrink-0 items-center justify-center overflow-hidden", sizeClasses.icon)}>
+            {leadingIcon}
+          </span>
+        )}
+        {children != null && <span className={cx("text-center whitespace-nowrap", sizeClasses.text)}>{children}</span>}
+        {trailingIcon && (
+          <span className={cx("flex shrink-0 items-center justify-center overflow-hidden", sizeClasses.icon)}>
+            {trailingIcon}
+          </span>
+        )}
+      </button>
+    </div>
   );
 }

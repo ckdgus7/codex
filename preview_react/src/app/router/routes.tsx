@@ -98,6 +98,22 @@ const LoginErrorPage = lazy(() =>
   import('@/pages/workspace/LoginErrorPage').then(m => ({ default: m.LoginErrorPage })),
 );
 
+const LifecycleInfoPage = lazy(() =>
+  import('@/pages/sbf/LifecycleInfoPage').then(m => ({ default: m.LifecycleInfoPage })),
+);
+const SbfExplorerPage = lazy(() =>
+  import('@/pages/sbf/SbfExplorerPage').then(m => ({ default: m.SbfExplorerPage })),
+);
+const BusinessAreaInfoPage = lazy(() =>
+  import('@/pages/sbf/BusinessAreaInfoPage').then(m => ({ default: m.BusinessAreaInfoPage })),
+);
+const BusinessFlowInfoPage = lazy(() =>
+  import('@/pages/sbf/BusinessFlowInfoPage').then(m => ({ default: m.BusinessFlowInfoPage })),
+);
+const BusinessFlowDetailPage = lazy(() =>
+  import('@/pages/sbf/BusinessFlowDetailPage').then(m => ({ default: m.BusinessFlowDetailPage })),
+);
+
 const FlowManagementPage = lazy(() =>
   import('@/pages/business-info/FlowManagementPage').then(m => ({ default: m.FlowManagementPage })),
 );
@@ -164,6 +180,12 @@ export const routes: RouteObject[] = [
       { path: '/ssf/business/:id', element: withSuspense(BusinessDetailPage) },
       { path: '/ssf/function', element: withSuspense(FunctionInfoPage) },
       { path: '/ssf/explorer', element: withSuspense(SsfExplorerPage) },
+
+      { path: '/sbf/lifecycle', element: withSuspense(LifecycleInfoPage) },
+      { path: '/sbf/business-area', element: withSuspense(BusinessAreaInfoPage) },
+      { path: '/sbf/business-flow', element: withSuspense(BusinessFlowInfoPage) },
+      { path: '/sbf/business-flow/:id', element: withSuspense(BusinessFlowDetailPage) },
+      { path: '/sbf/explorer', element: withSuspense(SbfExplorerPage) },
 
       { path: '/workspace/users', element: withSuspense(UsersPage) },
       { path: '/workspace/terms', element: withSuspense(TermsPage) },

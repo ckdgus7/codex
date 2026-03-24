@@ -9,7 +9,8 @@ export interface QnAListParams {
 }
 
 export interface QnAItem {
-  no: number;
+  id: number;
+  no?: number;
   category: string;
   title: string;
   hasReply: boolean;

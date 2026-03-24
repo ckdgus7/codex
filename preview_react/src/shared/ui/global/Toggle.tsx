@@ -13,121 +13,28 @@ interface ToggleProps {
   style?: CSSProperties;
 }
 
-const FONT_FAMILY = "'Pretendard', sans-serif";
+const cx = (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(" ");
 
-const COLORS = {
-  checkedTrack: "#7a5af8",
-  uncheckedTrack: "#ffffff",
-  uncheckedTrackBorder: "#e4e7ec",
-  disabledCheckedTrack: "#71717a",
-  disabledUncheckedTrack: "#fcfcfd",
-  knobChecked: "#ffffff",
-  knobUnchecked: "#71717a",
-  knobDisabledUnchecked: "#e4e7ec",
-  labelText: "#3f3f46",
+const SIZE_CLASSES: Record<ToggleSize, { track: string; knob: string; label: string; gap: string; pad: string }> = {
+  l: { track: "w-10 rounded-xl", knob: "h-4 w-4 rounded-[10px]", label: "text-base leading-6", gap: "gap-2", pad: "p-1" },
+  m: { track: "w-9 rounded-[10px]", knob: "h-[14px] w-[14px] rounded-lg", label: "text-sm leading-5", gap: "gap-2", pad: "p-[3px]" },
+  s: { track: "w-8 rounded-[10px]", knob: "h-3 w-3 rounded-lg", label: "text-xs leading-[18px]", gap: "gap-2", pad: "p-[3px]" },
 };
 
-const SIZE_CONFIG: Record<
-  ToggleSize,
-  {
-    trackWidth: number;
-    padding: number;
-    knobSize: number;
-    knobBorderRadius: number;
-    trackBorderRadius: number;
-    fontSize: number;
-    lineHeight: string;
-    gap: number;
-  }
-> = {
-  l: { trackWidth: 40, padding: 4, knobSize: 16, knobBorderRadius: 10, trackBorderRadius: 12, fontSize: 16, lineHeight: "24px", gap: 8 },
-  m: { trackWidth: 36, padding: 3, knobSize: 14, knobBorderRadius: 8, trackBorderRadius: 10, fontSize: 14, lineHeight: "20px", gap: 8 },
-  s: { trackWidth: 32, padding: 3, knobSize: 12, knobBorderRadius: 8, trackBorderRadius: 10, fontSize: 12, lineHeight: "18px", gap: 8 },
-};
-
-export function Toggle({
-  checked,
-  onChange,
-  label,
-  labelPosition = "right",
-  size = "m",
-  disabled = false,
-  style,
-}: ToggleProps) {
-  const config = SIZE_CONFIG[size];
-  const trackHeight = config.knobSize + config.padding * 2;
-
-  const containerStyle: CSSProperties = {
-    display: "flex",
-    gap: config.gap,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 4,
-    cursor: disabled ? "not-allowed" : "pointer",
-    userSelect: "none",
-    ...style,
-  };
-
-  const trackStyle: CSSProperties = {
-    width: config.trackWidth,
-    height: trackHeight,
-    borderRadius: config.trackBorderRadius,
-    padding: config.padding,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: checked ? "flex-end" : "flex-start",
-    overflow: "hidden",
-    flexShrink: 0,
-    boxSizing: "border-box",
-    ...(checked
-      ? disabled
-        ? { backgroundColor: COLORS.disabledCheckedTrack, opacity: 0.6 }
-        : { backgroundColor: COLORS.checkedTrack }
-      : disabled
-        ? {
-            backgroundColor: COLORS.disabledUncheckedTrack,
-            border: `1px solid ${COLORS.uncheckedTrackBorder}`,
-          }
-        : {
-            backgroundColor: COLORS.uncheckedTrack,
-            border: `1px solid ${COLORS.uncheckedTrackBorder}`,
-          }),
-  };
-
-  const knobStyle: CSSProperties = {
-    width: config.knobSize,
-    height: config.knobSize,
-    borderRadius: config.knobBorderRadius,
-    flexShrink: 0,
-    ...(checked
-      ? { backgroundColor: COLORS.knobChecked }
-      : disabled
-        ? { backgroundColor: COLORS.knobDisabledUnchecked, opacity: 0.5 }
-        : { backgroundColor: COLORS.knobUnchecked, opacity: 0.3 }),
-  };
-
-  const labelStyle: CSSProperties = {
-    fontFamily: FONT_FAMILY,
-    fontSize: config.fontSize,
-    fontWeight: 400,
-    lineHeight: config.lineHeight,
-    color: COLORS.labelText,
-    whiteSpace: "nowrap",
-  };
-
-  const handleClick = () => {
-    if (!disabled) {
-      onChange(!checked);
-    }
-  };
-
-  const labelElement = label ? <span style={labelStyle}>{label}</span> : null;
+export function Toggle({ checked, onChange, label, labelPosition = "right", size = "m", disabled = false, style }: ToggleProps) {
+  const sizeClasses = SIZE_CLASSES[size];
+  const labelElement = label ? <span className={cx("whitespace-nowrap font-sans font-normal text-[#3f3f46]", sizeClasses.label)}>{label}</span> : null;
 
   return (
-    <div style={containerStyle} onClick={handleClick}>
+    <div className={cx("flex select-none items-center justify-center rounded", sizeClasses.gap, disabled ? "cursor-not-allowed" : "cursor-pointer")} style={style} onClick={() => !disabled && onChange(!checked)}>
       {labelPosition === "left" && labelElement}
-      <div style={trackStyle}>
-        <div style={knobStyle} />
+      <div className={cx(
+        "flex shrink-0 items-center overflow-hidden box-border",
+        sizeClasses.track,
+        sizeClasses.pad,
+        checked ? (disabled ? "justify-end bg-[#71717a] opacity-60" : "justify-end bg-[#7a5af8]") : (disabled ? "justify-start border border-[#e4e7ec] bg-[#fcfcfd]" : "justify-start border border-[#e4e7ec] bg-white")
+      )}>
+        <div className={cx(sizeClasses.knob, checked ? "bg-white" : disabled ? "bg-[#e4e4e7] opacity-50" : "bg-[#71717a] opacity-30")} />
       </div>
       {labelPosition === "right" && labelElement}
     </div>
