@@ -1,0 +1,232 @@
+track-b-react-notices
+Overview
+A React frontend application built with Vite, TypeScript, React Router v7, TanStack Query, and Zustand. It follows a feature-based architecture with a NOVA AI DevOps themed layout (vertical sidebar + content area).
+
+Project Structure
+src/
+  app/          - App root, providers, router setup
+  features/     - Feature modules (notices, qna, ssf)
+  pages/        - Page-level components
+  shared/       - Shared utilities and UI components (GNB, LNB, Layout)
+  main.tsx      - Application entry point
+.storybook/     - Storybook configuration (main.ts, preview.ts)
+index.html      - HTML shell
+vite.config.ts  - Vite configuration
+Storybook
+Port: 6000 (workflow: Storybook, command: npm run storybook)
+Config: .storybook/main.ts (uses @storybook/react-vite v10, @ path alias via viteFinal)
+Preview: .storybook/preview.ts (centered layout, light/grey/dark backgrounds)
+Stories location: Co-located with components as *.stories.tsx files
+Component library coverage:
+src/shared/ui/global/ — Button, Input, Checkbox, Toggle, RadioGroup, SelectBox, Textarea, DatePicker, ChooseButton, AlertModal, Snackbar, FileUpload (12 components)
+src/shared/ui/service/ — Breadcrumb, PageTitle, PageFooter, BlankPage, MdiTab, TopUtil, MyInfo, MyNotification, TiptapEditor, BpmnViewer, ToastEditor (11 components)
+src/shared/ui/popup/ — ReasonPopup, TermsPopup, PrivacyPopup (3 components)
+Menu Structure & Routes
+요구관리
+요구사항 /requirements
+요구사항 명세 작성 /requirements/spec
+요구사항 검토자 배정 /requirements/reviewer
+요구사항 검토 /requirements/review
+요구상세 /requirements/detail
+요구상세 승인 /requirements/approval
+요구사항 반려 검토 /requirements/reject-review
+업무 Flow 설계 /requirements/flow-design
+애플리케이션 설계 /requirements/app-design
+UI 관리
+SB기획 /ui/sb-planning
+UI디자인 /ui/design
+퍼블리싱 /ui/publishing
+기능관리
+기능설계 /features/design
+상세기능 설계 /features/detail-design
+게시판
+공지사항 /notices (fully implemented: Figma-based design with category filter SelectBox, search scope SelectBox + keyword search, data table with 8 columns (번호/분류/제목/작성자/등록일/수정일/첨부/조회수), column sorting, category badges (공지/일반), pinned badge (필독), pagination with items-per-page, 30 mock rows, "등록" button opens create popup. Create popup: 880px modal with header (title + close + required indicator), form body (분류 RadioGroup 공지/필독공지/일반, 제목 Input + 작성자 Input row, 게시 RadioGroup 즉시, 내용 Textarea, 첨부 file upload with drag/click), footer (취소/임시저장/등록 buttons))
+Q&A /qna, Q&A 상세 /qna/:id
+SSF관리
+API Layer (src/features/ssf/api/): TanStack Query hooks wrapping mock data getters. domain.queries.ts (useDomainListQuery, useDomainDetailQuery), component.queries.ts (useComponentListQuery, useComponentByNameQuery), business.queries.ts (useBusinessListQuery, useBusinessDetailQuery). All UI files import query hooks instead of direct mock data.
+도메인(L1)정보 관리 /ssf/domain (fully implemented, files in src/features/ssf/ui/l1/: DomainListView, DomainCreatePopup, DomainDeletePopup, DomainDetailPopup, DomainEditPopup, DomainFormPopup. Filter bar with ChooseButton + search, data table with sorting/pagination, 13 mock rows, detail/create/edit/delete popups; row click → detail popup → edit or delete)
+컴포넌트(L2)정보 관리 /ssf/component (fully implemented, files in src/features/ssf/ui/l2/: ComponentInfoListView, ComponentCreatePopup, ComponentDeletePopup, ComponentDetailPopup, ComponentEditPopup. Filter bar with ChooseButton + 도메인(L1) SelectBox + 검색범위 SelectBox + search input, data table with 9 columns, column sorting, 사용여부 badges, pagination, 64 mock rows, 등록/detail/edit/delete popups)
+업무(L3)정보 관리 /ssf/business (fully implemented, files in src/features/ssf/ui/l3/: BusinessInfoListView, BusinessCreatePopup, BusinessEditPopup, BusinessDetailView. Filter bar, data table with 11 columns, sorting, pagination, 120 mock rows, 등록 button → BusinessCreatePopup, row click → navigates to detail page)
+업무(L3)정보 상세 /ssf/business/:id (full page detail view in src/features/ssf/ui/l3/BusinessDetailView.tsx, refactored into 4 sub-components in src/features/ssf/ui/component/:
+BusinessReference (component/BusinessReference.tsx): 업무(L3) 기준 정보 section (ID/명/L2기획리더/L3설계리더/저장일시/수정일시/설명), SSF 정보 accordion (EPC/TMFC tabs with component details + 연관 업무 L3 paginated list). Owns activeSsfTab, epcL3Page, tmfcL3Page state internally.
+HistoryPanel (component/HistoryPanel.tsx): History sidebar (timeline with 수정/저장 entries). Conditionally rendered via historyOpen state in parent.
+BpmnManagement (component/BpmnManagement.tsx): BPD 관리 section (BPD 추가 form with ToastEditor/RadioGroup/Button, AssetAccordion list with BPMN viewer + version history + spec/edit). Owns expandedBpd, bpdAddOpen, bpdSpec, bpdVersionType, bpdVersionDesc state internally.
+RelatedInfo (component/RelatedInfo.tsx): 연관 정보 right column (기능L4/업무Flow/요구사항/연관 과제 lists with badges and pagination). Owns funcL4Page, reqPage, projectPage state internally.
+Parent BusinessDetailView.tsx handles route lookup, tab registration, header actions, edit popup, historyOpen toggle, and no-data fallback.)
+기능(L4)정보 관리 /ssf/function
+SSF탐색기 /ssf/explorer
+SBF관리
+API Layer (src/features/sbf/api/): TanStack Query hooks wrapping mock data getters. lifecycle.queries.ts (useLifecycleListQuery, useLifecycleDetailQuery). Query key namespace via lifecycleKeys.
+Model (src/features/sbf/model/): types.ts (LifecycleItem, LifecycleSortKey, SortDir), mock-data.ts (13 mock rows, getLifecycleList, getLifecycleDetail).
+Lifecycle(D1) 관리 /sbf/lifecycle (fully implemented, file: src/features/sbf/ui/d1/LifecycleListView.tsx. Filter bar with ChooseButton (전체/사용/미사용) + search input (ID/명 검색), data table with 6 columns: No/Lifecycle ID/Lifecycle명(한글)/Lifecycle명(영문)/설명/사용여부, column sorting, 사용여부 badges, pagination, 13 mock rows, "Lifecycle(D1) 신규 등록" button in PageHeader)
+업무영역(D2) 관리 /sbf/business-area (BlankPage)
+업무Flow(D3) 관리 /sbf/business-flow (BlankPage)
+워크스페이스
+사용자 관리 /workspace/users
+사이트 이용약관 관리 /workspace/terms
+개인정보 처리방침 관리 /workspace/privacy
+업무 기준 정보 관리
+업무Flow 관리 /business-info/flow
+화면 기준 정보 관리 /business-info/screen
+개발 진척 관리 /business-info/progress
+과제 관리 /business-info/project
+Pages with full UI implementation:
+
+공지사항 목록 (/notices) — Figma-based table list with category/search filters, 8-column sortable table with badges, pagination. Row click navigates to detail page.
+공지사항 상세 (/notices/:id) — Figma-based detail view with metadata row (분류 badge, 작성자, 등록일, 조회수), title with pinned badge, content body, file attachments list (with download count, size, date), footer buttons (목록/수정/삭제). 수정 button opens edit popup (NoticeEditPopup) pre-populated with notice data (category, title, author, post type, content, existing attachments). Edit popup: 880px modal, same layout as create popup with title "공지사항 수정", footer (취소/임시저장/저장).
+Q&A 목록 (/qna) — Figma-based table list with category filter (전체/이용문의/기술), search scope + keyword, 6-column sortable table (번호/분류/제목/작성자/등록일/상태), status badges (답변완료/답변대기), reply icon on title, pagination, 등록 button. 30 mock rows. Row click navigates to detail page.
+Q&A 상세 (/qna/:id) — Figma-based detail view with metadata row (분류 badge, 작성자, 등록일, 조회수), title + content body, file attachments list, comment section. No comments → shows Textarea editor + 댓글등록 button. Has comments → shows comment list with content, author/date meta, 수정/삭제 buttons per comment. Footer: 목록 + 삭제 buttons. AlertModal for delete confirmation, Snackbar for success feedback.
+요구사항 (/requirements) — card list with filter bar (date range, status, search scope + keyword), tabs (All/Personal), chip sort (Update 일시/완료 희망일), pagination, and requirement cards (status circle badge, req ID, title, due date, task, updated time, author with role icon)
+All other pages are blank placeholder pages using the shared BlankPage component.
+
+Shared UI Components
+LNB (src/shared/ui/service/LNB.tsx): Main Sidebar - logo, collapsible GNB/LNB navigation sections, favorites, collapse toggle (240px ↔ 44px)
+LayoutRoute (src/shared/ui/LayoutRoute.tsx): Main layout wrapper (stays in shared/ui/) combining LNB sidebar + right column (PageHeader fixed top + scrollable content area + PageFooter fixed bottom). PageHeader and PageFooter are managed at layout level — pages do NOT render them directly.
+PageHeader (src/shared/ui/service/PageHeader.tsx): Site header wrapper combining MDI Tab (36px) + page title wrap (120px). Rendered by LayoutRoute (not by individual pages). Reads breadcrumb/title from pageHeader.store.ts Zustand store. Pages set their header config via usePageHeader() hook from src/shared/hooks/usePageHeader.ts.
+MdiTab (src/shared/ui/service/MdiTab.tsx): MDI tab bar (36px, bg #fafafa). Each tab has label + close button, max-width 240px. Managed by Zustand store (mdi.store.ts). Pages register their own tab via useMdiStore.addTab().
+Breadcrumb (src/shared/ui/service/Breadcrumb.tsx): Navigation breadcrumb with home icon, chevron dividers. 12px Pretendard font. Last item is active (#3f3f46, Medium weight) with hover underline.
+PageTitle (src/shared/ui/service/PageTitle.tsx): Page title (32px Bold, 40px line-height) with optional status badge (purple #7a5af8) and ID badge (blue #36bffa), favorite button (1px solid black border, 3px padding), optional back button, refresh button, and CTA action slot.
+PageFooter (src/shared/ui/service/PageFooter.tsx): Footer with copyright text (10px #a1a1aa) and links (서비스 이용약관 12px Regular, 개인정보처리방침 12px Bold in #52525b). Border-top #e4e4e7, padding 16px 32px. Rendered by LayoutRoute (not by individual pages).
+Shared Styles (src/shared/ui/styles.ts): Centralized style system exporting:
+FONT — Pretendard font family constant
+typography — Figma-based typography system (title page/popup, paragraphTitle xl→xs, paragraph xl→xs, field labelM/S/valueL/M/indicator/placeholderL)
+listStyles — Common list view styles (outer, main, filterWrap, listWrap, tableFunction, tableFuncLeft, badge, listAction, paginationField, paginationLabel, itemsSelect, indicator, paginationWrap, pageBtn, pageBtnActive, pageBtnInactive, downloadBtn, table, th, thInner, td, tdLeft, useBadge, unuseBadge)
+detailStyles — Common detail view styles (outer, main, contentWrap, metaRow, metaItem, metaLabel, metaValue, categoryBadge, contentSection, contentLabel, contentBody, attachSection, attachLabel, fileList, fileItem, fileNameWrap, fileName, fileMeta, fileMetaItem, fileMetaLabel, fileMetaValue, btnRow, btnLeft, btnRight)
+popupStyles — Common popup styles (overlay, popup, header, titleRow, titleText, closeBtn, requiredRow, requiredDot, requiredText, main, formSection, fieldGroup, fieldLabel, labelText, fieldRow, uploadArea, uploadAreaDragging, uploadText, uploadBtn, fileList, fileItem, fileName, fileDeleteBtn, footer, footerLeft, footerRight)
+Feature files import shared styles and use spread overrides for file-specific variations.
+Button (src/shared/ui/global/Button.tsx): Figma-based button component. Props: size (l/m/s → 40/32/24px), variant (filled/outlined/text), color (positive #7a5af8, negative #f04438, warning #f79009, success #1ac057, info #71717a), disabled (opacity 0.4), leadingIcon, trailingIcon, children. Font: L=16px Bold, M=14px Medium, S=12px Regular. Border-radius 4px. Named export Button.
+Input (src/shared/ui/global/Input.tsx): Figma-based input field. Props: label, required (6px blue dot), prefix ("search" → built-in magnifier icon), leftIcon, rightIcon, indicator (char count), error (red border #f04438), disabled, helperText. Field base: 40px height, 8px padding, border 1px solid #e4e7ec, radius 4px. Focus border #7a5af8. Text: Pretendard Regular 16px/24px. Label: Medium 14px/18px #a1a1aa. prefix takes priority over nothing but leftIcon overrides prefix.
+DatePicker (src/shared/ui/global/DatePicker.tsx): Figma-based date picker field. Same Field pattern as Input. Props: value (string), onChange (string callback), label, required, disabled, error, helperText. Right calendar icon (SVG). Native browser picker icon hidden. Focus/error border same as Input.
+SelectBox (src/shared/ui/global/SelectBox.tsx): Figma-based select dropdown. Supports single and multi-select modes via discriminated union props. Single mode (default): value: string, onChange: (value: string) => void. Multi mode (multiple={true}): value: string[], onChange: (value: string[]) => void, displays selected items as chips (bg #fafaff, text #52525b 12px Medium, max-w 130px, border-radius 6px, X close icon 12px). Each chip has close button to remove. Clear all button (ClearIcon) when items selected. Searchable (searchable={true}): single-select shows search input at top of dropdown with search icon; multi-select shows inline search input inside the field alongside chips (Figma-accurate). Search highlighting (searchHighlight={true}, default true): matched search text in dropdown options rendered in bold purple (#7a5af8) via HighlightedLabel component. maxSelections (multi only): limits number of selectable items, dims options at limit. selectAllLabel (multi only): adds "select all" option at top of dropdown. Dropdown options: multi-mode shows MiniCheckbox (20x20, checked #7a5af8 + white checkmark), single-mode shows text only. Option row: 40px height, padding 8px 16px. Hover #f4f4f5, selected #ede9fe. Max dropdown height 296px. Common props: options ({label, value}[]), placeholder, label, required, disabled, error, helperText, searchPlaceholder, searchHighlight, style, wrapperStyle.
+RadioGroup (src/shared/ui/global/RadioGroup.tsx): Figma-based radio button group. Props: value, onChange (string callback), options ({label, value, disabled?}[]), size (l/m/s → 24/20/18px circle), disabled, direction (horizontal/vertical), gap. Checked: bg #7a5af8, white inner dot. Unchecked: white bg, border #e4e7ec, gray inner dot opacity 0.3. Disabled: bg #71717a opacity 0.6. Label: Pretendard Regular, color #3f3f46. Sizes: L=16px, M=14px, S=12px text.
+ChooseButton (src/shared/ui/global/ChooseButton.tsx): Figma-based radio button group (RadioBtnControl). Props: value, onChange (string callback — parent에서 실행할 함수 지정), options ({label, value}[]). Active: bg #7a5af8, Default: bg #bdb4fe. Text: Pretendard Regular 16px/24px #fafaff. Padding 12px/8px. Container border-radius 6px, overflow hidden. 3개 또는 4개 이상 버튼 지원.
+Toggle (src/shared/ui/global/Toggle.tsx): Figma-based toggle switch. Props: checked, onChange (boolean callback), label, labelPosition ("left"/"right" — 좌측/우측 레이블 위치), size (l/m/s → track 40/36/32px), disabled. Checked: track bg #7a5af8, white knob right. Unchecked: track white + border #e4e7ec, gray knob left opacity 0.3. Disabled checked: track #71717a opacity 0.6. Disabled unchecked: track #fcfcfd, knob #e4e7ec opacity 0.5. Knob sizes: L=16px, M=14px, S=12px.
+Snackbar (src/shared/ui/global/Snackbar.tsx): Figma-based snackbar/toast notification. Props: open, onClose, message (ReactNode), type (info #71717a, positive #7a5af8, negative #f04438, error #ee46bc, warning #f79009, success #1ac057), duration (auto-dismiss ms, default 3000). Container: 480px width, padding 24/12/16px, border-radius 8px, fixed bottom-center. Text: Pretendard Regular 16px/24px white. Close X 24x24 white.
+AlertModal (src/shared/ui/global/AlertModal.tsx): Figma-based alert modal dialog. Props: open, onClose, type (info/success/warning/error — 각각 다른 아이콘), message (ReactNode), confirmLabel, cancelLabel, onConfirm, onCancel, showCancel (true → 취소+삭제 2버튼, false → 확인 1버튼). Container: 440px width, padding 24px, border-radius 16px, shadow. Close X 버튼 top-right 10px. Icon 52x52px. Message: Pretendard Regular 16px/24px #71717a center. Backdrop overlay. ESC 키 닫기 지원. 기존 Button 컴포넌트 활용.
+Textarea (src/shared/ui/global/Textarea.tsx): Figma-based textarea field. Props: label, required (6px blue dot), indicator (charCount/maxLength, default true), maxLength (default 300), error (border #ee46bc), helperText, readOnly (bg #fafafa), disabled (bg #f4f4f5). Container: min-height 120px, padding 8px, border 1px solid, radius 4px, flex-col justify-between. Focus border #7a5af8. Text: Pretendard Regular 16px/24px #3f3f46. Indicator: 12px/18px #a1a1aa bottom-right.
+Checkbox (src/shared/ui/global/Checkbox.tsx): Figma-based checkbox. Props: checked, onChange (boolean callback), label, size (l/m/s → 24/20/18px box), disabled. Checked: bg #7a5af8, white checkmark SVG. Unchecked: white bg, border #e4e7ec. Disabled: bg #71717a opacity 0.6 (checked) or border opacity 0.6 (unchecked). Border-radius 4px (L/M) or 3px (S). Label: Pretendard Regular, color #3f3f46. Sizes: L=16px, M=14px, S=12px text.
+TiptapEditor (src/shared/ui/service/TiptapEditor.tsx): Rich text editor using Tiptap. Props: value (HTML string), onChange (html callback), placeholder, minHeight (default 300). Toolbar: H1-H3, bold/italic/underline/strikethrough, bullet/ordered list, blockquote/code block/horizontal rule, text align left/center/right, undo/redo. Extensions: StarterKit, Underline, TextAlign, Placeholder. Inline styles + injected CSS for ProseMirror.
+ToastEditor (src/shared/ui/service/ToastEditor.tsx): Rich text editor using @toast-ui/editor (core only, custom React wrapper for React 19 compat). Props: value (HTML string), onChange (html callback), placeholder, minHeight (default 300), height (default "auto"). Toolbar: heading/bold/italic/strike, hr/quote, ul/ol/task, table/link, code/codeblock. Default mode: WYSIWYG. Used in DomainFormPopup for domain description field.
+When composing screens, import and use the common components (such as Button, Input, Datepicker, SelectBox, RadioGroup, Checkbox, TiptapEditor, etc.) that are defined in shared/ui/global.
+All styles use inline CSSProperties (no CSS files, no Tailwind). Pretendard font family.
+Popup Components (src/shared/ui/popup/)
+ReasonPopup (src/shared/ui/popup/ReasonPopup.tsx): Common reason-input popup for approval/rejection/deletion workflows. Props: open, title (popup title text), onCancel (cancel/close handler), onConfirm (receives reason string), cancelLabel (default "닫기"), confirmLabel (default "승인"), placeholder, label (textarea label, defaults to ${title}사유), maxLength (default 300). Layout: 880px width popup with header (title + close X), main (Textarea with char indicator), footer (cancel outlined button + confirm filled positive button). Uses popupStyles from shared styles.
+TermsPopup (src/shared/ui/popup/TermsPopup.tsx): Service terms of use popup (서비스 이용약관). Props: open, onClose. Layout: 880px popup with header (title "서비스 이용약관" + close X), scrollable main area with legal text content (chapter titles, article titles, body text, ordered lists), footer with "닫기" button only. Opened from PageFooter's "서비스 이용약관" link click.
+PrivacyPopup (src/shared/ui/popup/PrivacyPopup.tsx): Privacy policy popup (개인정보 처리방침). Props: open, onClose. Layout: 880px popup with header (title "개인정보 처리방침" + close X), date field ("개정일자: 2026.02.03" with chevron), scrollable main area with legal text (chapter titles, numbered articles, body text, bullet lists, ordered lists), footer with "닫기" button only. Opened from PageFooter's "개인정보처리방침" link click.
+Service Components (src/shared/ui/service/)
+BpmnViewer (src/shared/ui/service/BpmnViewer.tsx): BPMN 2.0 diagram viewer using bpmn-js NavigatedViewer (mouse drag + zoom). Props: xml (BPMN XML string), onLoading, onError, onImport (warnings callback), onElementClick (element click handler), fitOnImport (default true), width/height/style/className. Built-in toolbar: zoom in/out, fit viewport, reset 1:1. Inline styles, border 1px solid #e4e7ec, borderRadius 8px.
+Tech Stack
+React 19 with TypeScript
+Vite 7 as the build tool and dev server
+React Router 7 for client-side routing
+TanStack React Query 5 for server state management
+Zustand 4 for client state management
+bpmn-js for BPMN 2.0 diagram rendering (NavigatedViewer)
+Running the App
+The dev server runs on port 5000 (0.0.0.0) via:
+
+npm run dev
+Deployment
+Configured as a static deployment:
+
+Build command: npm run build
+Public directory: dist
+Prompt Rules
+Always maintain the folder structure as defined below.
+
+When a new scre* Never modify common components in shared/ui unless requested.en is created, add the corresponding domain under features and pages at the appropriate location and proceed accordingly. src/ ├─ app/ │ ├─ providers/ │ ├─ router/ │ └─ store/ ├─ features/ │ ├─ notices/ │ │ ├─ components/ │ │ ├─ hooks/ │ │ ├─ api/ │ │ ├─ model/ │ │ ├─ ui/ │ ├─ qna/ │ │ ├─ api/ │ │ ├─ model/ │ │ ├─ ui/ ├─ pages/ │ ├─ notices/ │ ├─ requirements/ │ ├─ ui-management/ │ ├─ feature-management/ │ ├─ qna/ ├─ shared/ │ ├─ components/ │ ├─ hooks/ │ └─ lib/ │ └─ ui/ │ └─ utils/
+
+Component Rules
+All components must be function components.
+Props must be defined using an interface.
+export default is prohibited (use named exports only).
+Use components and utilities, library, ui from the shared directory when constructing pages.
+When constructing a screen, use shared/ui/styles.ts for styling, and if a style does not exist, add it and import it for use.
+When modifying a screen, do not make any changes to other domains unless explicitly requested.
+Please conduct a code review and verify that the build completes successfully, and check for any errors.
+When components in the shared/ui/global, shared/ui/service, or shared/ui/popup folders are changed, modified, or deleted, make the same changes, modifications, or deletions in the corresponding stories as well.
+Features must depend only on shared, and direct dependencies on other features are prohibited.
+Pages should only compose features and must not be aware of their internal implementations.
+For data integration such as APIs, create a features/api folder and implement it using @tanstack/react-query.
+When adding screen or popup files, check the Figma design and the existing files in parallel.
+Refer to similar screens or popups.
+Refer to similar script functionality and interactions in the existing files.
+Analyze the Figma node spec structure as deeply as possible.
+When a file is created under the pages/ folder, add a route to src/app/router/routes.tsx.
+Hook Rules
+Server state must use React Query only.
+Direct API calls are prohibited.
+State Ownership Rules
+R1. Server State must use React Query only
+Do not store remote data (GET/POST/PATCH/DELETE results) in Zustand.
+The Query Cache is the single source of truth for globally stored server data.
+R2. Client State must use Zustand only
+UI state (modal/toast/sidebar), temporary drafts, and wizard progress must use Zustand.
+Do not store UI state inside the React Query cache.
+R3. Shareable State must use URL (Search Params) only
+List filters/sorting/pagination/tabs must not use Zustand; manage them only via useSearchParams.
+URL state must be connected to Query key parameters.
+Query Key / Caching Rules
+R4. Enforce Query Key namespace
+Only the pattern below is allowed:
+
+featureKeys = { all, list(params), detail(id), ... }
+Hardcoded string queryKeys are prohibited.
+
+R5. Fix Query Key parameter shape
+params must always maintain the same shape (inject default values for missing fields).
+page must be a number.
+q/sort must be normalized as string/enum before composing the query key.
+R6. List pagination UX rule
+List queries must use keepPreviousData (or placeholderData) by default.
+Arbitrary use of staleTime = 0 is prohibited (follow the default staleTime policy).
+Mutation / Synchronization Rules
+R7. Standardize synchronization after mutation success
+After a successful mutation, 반드시 one of the following must be executed:
+
+invalidateQueries({ queryKey: featureKeys.all })
+Update cache directly using setQueryData (including optimistic updates)
+R8. Do not store server responses in Zustand during mutation
+If necessary, only store id or selection state in Zustand.
+Router Integration Rules
+R9. Route-level data prefetching (optional rule)
+Prefer using queryClient.prefetchQuery before route entry.
+Do not enforce for all routes; focus on core list/detail pages.
+R10. Centralize URL parameter parsing/validation
+Normalize via a utility function such as parseBoardListSearchParams().
+Duplicate parsing logic inside components is prohibited.
+Zustand Store Design Rules
+R11. Store separation principle
+Separate by purpose: uiStore, sessionStore, draftStore, etc.
+Even if feature stores are created, storing server data is prohibited.
+R12. Enforce selector usage
+Full subscription via useStore() is prohibited.
+Only selector usage is allowed: useStore(s => s.xxx) (to prevent excessive re-renders).
+R13. Persist usage criteria (optional rule)
+persist is allowed only for:
+
+Theme / language / UX preferences
+Authentication-related data (upon policy approval)
+Filters and pagination must not use persist (= URL is the source of truth).
+
+API Layer Rules
+R14. Restrict direct API calls
+Direct fetch/axios calls inside components are prohibited.
+
+API calls are allowed only in:
+
+features/*/api/*
+shared/api/*
+R15. API types belong to feature/types
+Request/response types must be located within the feature.
+Usage of any is prohibited (enforced via ESLint).
+Code Generation / Vibe Coding AI Rules (Operational Rules)
+R18. Always decide state ownership first
+The generation prompt must explicitly include:
+
+Whether it is Server State
+Whether it is URL State
+Whether Zustand is required
+R19. File-level responsibility for generated code
+components handle rendering only; data fetching must be separated into queries/hooks.
+Combining Router + Query + UI logic in a single file is prohibited (enforce max line/complexity limits).

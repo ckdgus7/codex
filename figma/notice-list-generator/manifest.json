@@ -1,0 +1,7 @@
+{
+  "name": "Notice List Generator",
+  "id": "github-codex-notice-list-generator",
+  "api": "1.0.0",
+  "main": "code.js",
+  "editorType": ["figma"]
+}
